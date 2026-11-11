@@ -211,7 +211,7 @@ export const rippling: Provider = {
   boardUrl: (c) => `https://ats.rippling.com/${c.slug}/jobs`,
   async list(c, opts) {
     // Not ordered by date, so always read every page (boards are small).
-    const { items, complete, total } = await paginate(
+    const { items, complete } = await paginate(
       async (offset) => {
         const d = await getJson<{ items?: RpItem[]; totalItems?: number }>(
           `https://ats.rippling.com/api/v2/board/${enc(c.slug)}/jobs?page=${Math.floor(offset / 100)}&pageSize=100`,
