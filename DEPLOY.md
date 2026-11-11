@@ -45,8 +45,8 @@ Healthchecks.io emails you if the crawler stops.
    | `SMTP_PASS` | its 16-character App Password (step 5) |
    | `HEALTHCHECK_URL` | optional, from step 6 |
 2. Go to **Actions → crawl → Run workflow** to start the first crawl now. It takes 1–2 minutes and fills the database.
-3. After that it runs every 15 minutes by itself.
-   - **Private repo?** Edit `.github/workflows/crawl.yml` and change the cron to `"7,37 * * * *"` (every 30 minutes) to stay within the free minutes.
+3. After that it runs every 15 minutes by itself: each run queues the next one 15 minutes after it started, and the cron schedule restarts the chain if it ever stops.
+   - **Private repo?** Delete the "Queue the next crawl" step in `.github/workflows/crawl.yml` and change the cron to `"7,37 * * * *"` (every 30 minutes) to stay within the free minutes.
    - GitHub pauses schedules in public repos after 60 days with no commits. Pushing any commit re-enables them.
 
 ## 4. Deploy the website (Vercel)
@@ -54,7 +54,9 @@ Healthchecks.io emails you if the crawler stops.
 2. Before clicking Deploy, add **Environment Variables**:
    | Name | Value |
    |---|---|
-   | `DATABASE_URL` | same Supabase URI |
+   | `DATABASE_URL` | the Supabase **Transaction pooler** URI (Connect → Transaction pooler, port **6543**). The session pooler allows only 15 connections, which Vercel uses up. |
+   | `SKIP_MIGRATIONS` | `1` (the crawler applies migrations; the transaction pooler can't hold the migration lock) |
+   | `DB_POOL_MAX` | `1` |
    | `BETTER_AUTH_SECRET` | run `openssl rand -base64 32` and paste the output |
    | `BETTER_AUTH_URL` | `https://<your-app>.vercel.app` |
    | `SITE_URL` | `https://<your-app>.vercel.app` |

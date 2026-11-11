@@ -1,63 +1,101 @@
 # SourceFirst
 
-A job board that reads company job boards on 9 applicant tracking systems (Workday, Greenhouse, Lever, Ashby, SmartRecruiters, Workable, Rippling, Recruitee, Oracle Cloud) directly every 15 minutes, so jobs show up here before they reach LinkedIn or Indeed. Users can create accounts, save jobs, track applications, and get email alerts for saved searches.
+A job board that reads company career pages directly every 15 minutes, so you see a role minutes after it's posted and can be the 1st applicant, not the 500th.
 
-## Run it locally (no setup needed)
+[![ci](https://github.com/snehshah74/sourcefirst/actions/workflows/ci.yml/badge.svg)](https://github.com/snehshah74/sourcefirst/actions/workflows/ci.yml)
+[![crawl](https://github.com/snehshah74/sourcefirst/actions/workflows/crawl.yml/badge.svg)](https://github.com/snehshah74/sourcefirst/actions/workflows/crawl.yml)
+![next.js 16](https://img.shields.io/badge/next.js-16-111214)
+![cost $0](https://img.shields.io/badge/hosting-%240-4d7c0f)
+[![live](https://img.shields.io/badge/live-source--first.vercel.app-111214)](https://source-first.vercel.app)
+
+## What is SourceFirst
+
+SourceFirst watches the applicant tracking systems companies post to and lists every open role the moment it appears there. There is no reposting and no middleman: each job links to the company's own application page.
+
+- **Straight from the source.** 559 company boards across 9 platforms: Workday, Greenhouse, Lever, Ashby, SmartRecruiters, Workable, Rippling, Recruitee and Oracle Cloud. That's about 135,000 open roles.
+- **Every 15 minutes.** A GitHub Actions crawler reads every board, adds new roles, and closes the ones that were taken down. Removed boards and dead postings never linger.
+- **Made for applying.** Search, filters for visa sponsorship, level, years of experience and salary, a saved-jobs tracker, and a "Did you apply?" check instead of guessing for you.
+- **Alerts that arrive first.** Save a search and get an email for each new match, or one daily digest. Alerts only go to confirmed addresses.
+- **Free to run.** Vercel for the site, Supabase for Postgres, GitHub Actions for the crawler. Total hosting cost: $0.
+
+## Quick start
+
 ```bash
+git clone https://github.com/snehshah74/sourcefirst
+cd sourcefirst
 npm install
-npm run dev          # http://localhost:3000
-```
-That's all. Locally the app uses an **embedded Postgres** (PGlite, stored in `./data/pg`) and a **built-in scheduler**. The first crawl starts a few seconds after boot, then repeats every 15 minutes while the server runs. Emails (alerts, password resets) print to the server log until `RESEND_API_KEY` is set.
-
-```bash
-npm run ingest       # trigger a crawl now (asks the running app to do it)
-npm test             # end-to-end pipeline tests against a throwaway database
-npm run discover     # find more company boards (see below)
+npm run dev
 ```
 
-Pages: `/` feed · `/sign-up` · `/sign-in` · `/account` (tracker summary, saved searches and alerts) · `/status` (pipeline health) · `/jobs/<slug>` (SEO pages).
+`npm run dev` starts the site at `http://localhost:3000` with an embedded Postgres in `./data/pg`, so there is nothing to configure. A full crawl of every board starts a few seconds after boot and repeats every 15 minutes while the server runs. Emails print to the server log until SMTP or Resend is set up.
 
-## The pipeline
-```
-scheduler (every 15 min) ──► /api/cron/ingest ──► runPipeline()
-                                                   ├─ runIngest(): for each enabled company board
-                                                   │    fetch (timeout + 3 retries) → enrich → upsert
-                                                   │    → close vanished jobs (with an empty-board guard)
-                                                   └─ sendAlerts(): email each user the jobs that are
-                                                        new since their last alert, per saved search
-```
-- **Run lock:** a crawl that starts while another is running is skipped, so two schedulers can't overlap.
-- **Board health:** each board's failure count and last error are stored and shown on `/status`.
-- **Empty-board guard:** a board that suddenly returns 0 jobs only gets its jobs closed after 3 empty crawls in a row.
-- **"New" means newly discovered:** on a company's first crawl, its backlog is imported without alerting anyone.
+Confirm the crawl finished. The dev server prints one line per run:
 
-| Piece | File |
+```
+[pipeline] startup: ok=559 failed=0 new=13 closed=15 alerts=1 pruned=0 in 605.4s
+```
+
+`/status` shows the same thing per board.
+
+## Commands
+
+| Command | What it does |
 |---|---|
-| Company list (board tokens) | `src/lib/companies.ts` |
-| ATS fetchers with retries | `src/lib/ats/index.ts` |
-| Enrichment (visa, US, experience, role, level) | `src/lib/enrich.ts` |
-| Crawl, upsert, close, lock | `src/lib/ingest.ts` |
-| Email alerts (instant or daily digest) | `src/lib/alerts.ts`, `src/lib/email.ts` (Gmail SMTP, Resend, or log) |
-| Schedulers | `.github/workflows/crawl.yml` (production, free), `src/instrumentation.ts` (local/servers), `vercel.json` (daily backup) |
-| DB schema and migrations | `src/db/schema.ts`, `drizzle/` (applied automatically on boot) |
-| Auth (Better Auth: email/password, optional Google) | `src/lib/auth.ts`, `src/app/api/auth/[...all]` |
-| User APIs | `src/app/api/me/saved`, `src/app/api/me/searches` |
+| `npm run dev` | Site plus local 15-minute crawler |
+| `npm run ingest` | Run a crawl now |
+| `npm test` | End-to-end pipeline tests against a throwaway database |
+| `npm run lint` | ESLint |
+| `npm run discover` | Find more company boards (see [Add companies](#add-companies)) |
+| `npm run db:generate` | Create a migration after editing `src/db/schema.ts` |
 
-## Deploy for free
-Step-by-step guide: **[DEPLOY.md](DEPLOY.md)**. It uses Vercel Hobby for the site, GitHub Actions for the 15-minute crawler, Supabase for Postgres, Gmail SMTP for email and Healthchecks.io for monitoring. Total cost: $0.
+## How it works
 
-## Changing the schema
-Edit `src/db/schema.ts`, run `npm run db:generate`, and commit the new file in `drizzle/`.
+```
+every 15 min ──► runPipeline()
+                  ├─ crawl: each board → fetch (timeouts, retries) → enrich → upsert
+                  │         → close roles that disappeared → drop boards that are gone
+                  ├─ alerts: email each confirmed user the new matches for their saved searches
+                  └─ prune: delete roles closed more than 14 days ago
+```
 
-## Adding companies (coverage = freshness)
-How fresh the feed feels depends on how many companies you crawl: 271 boards produce roughly 15–25 new jobs an hour.
-1. Add `Name|domain` lines to `scripts/candidates.txt`.
-2. Run `npm run discover`. It tries each name on Greenhouse, Lever, Ashby, SmartRecruiters, Workable, Rippling and Recruitee, and checks every careers URL in `scripts/boards.txt` (the only way to add Workday and Oracle boards, whose ids can't be guessed). Live boards go to `src/lib/companies.discovered.json`.
-3. Restart the app. The next crawl imports the new boards; their existing jobs come in without triggering alerts.
+- **Incremental, with an hourly full pass.** Most runs read only what changed; once an hour every board is read in full.
+- **Nothing stale.** A role that returns 404 is closed on the spot, and a board that disappears three times in a row is disabled.
+- **Empty-board guard.** A board that suddenly returns zero jobs isn't trusted until it happens three runs in a row.
+- **One run at a time.** A run lock stops two schedulers from overlapping.
+- **Enrichment.** Each role gets a category, level, minimum years, salary, remote flag and visa signal from its title and description.
 
-If a discovered board turns out to belong to a different company, add it to `BLOCKLIST` in `src/lib/companies.ts`.
+## Deploy
 
-## Next steps
-- **Coverage:** keep growing `candidates.txt` and `scripts/boards.txt` (paste any careers URL from the 9 supported platforms).
-- **AI enrichment:** send only `visa = 'Maybe'` jobs to an LLM.
-- **Email verification** before sending alerts (needs Resend configured).
+[DEPLOY.md](DEPLOY.md) walks through it in about 30 minutes:
+
+| Piece | Service | Notes |
+|---|---|---|
+| Website | Vercel Hobby | Use Supabase's **Transaction pooler** (port 6543) here |
+| Crawler | GitHub Actions | Each run queues the next one 15 minutes after it started; free on a public repo |
+| Database | Supabase Free | 500 MB; the crawler uses the **Session pooler** (port 5432) |
+| Email | Gmail SMTP or Resend | Optional; without it emails go to the log |
+
+Every push runs `.github/workflows/ci.yml`: lint, tests and a production build.
+
+## Add companies
+
+Coverage is freshness: more boards means more new roles an hour.
+
+1. Add `Name|domain` lines to `scripts/candidates.txt`, or paste careers URLs from any of the 9 platforms into `scripts/boards.txt` (the only way to add Workday and Oracle boards).
+2. Run `npm run discover`. Live boards are written to `src/lib/companies.discovered.json`.
+3. The next crawl imports them. Their existing roles come in quietly, without triggering alerts.
+
+A board that turns out to belong to the wrong company goes in `BLOCKLIST` in `src/lib/companies.ts`.
+
+## Project layout
+
+| Path | Contents |
+|---|---|
+| `src/lib/ats/` | One provider per platform |
+| `src/lib/ingest.ts` | Crawl, upsert, close, run lock |
+| `src/lib/enrich.ts` | Category, level, experience, salary, visa |
+| `src/lib/alerts.ts`, `src/lib/email.ts` | Alert emails |
+| `src/lib/auth.ts` | Accounts (Better Auth: email and password, optional Google) |
+| `src/db/schema.ts`, `drizzle/` | Schema and migrations, applied automatically |
+| `src/components/feed/` | The feed, cards, filters and job details |
+| `.github/workflows/` | `crawl.yml` (the 15-minute crawler) and `ci.yml` |
