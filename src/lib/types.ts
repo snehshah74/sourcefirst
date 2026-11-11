@@ -1,3 +1,6 @@
+/** Jobs a signed-out visitor can see per search before being asked to sign up. */
+export const GUEST_LIMIT = 12;
+
 export type Ats = "greenhouse" | "lever" | "ashby" | "workday" | "smartrecruiters" | "workable" | "rippling" | "recruitee" | "oracle";
 
 export type Visa = "Yes" | "No" | "Maybe";

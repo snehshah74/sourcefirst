@@ -17,7 +17,7 @@ export function CompanyLogo({ name, domain, size = 40, className }: { name: stri
         loading="lazy"
         onError={() => setFailed(true)}
         style={style}
-        className={cn("shrink-0 rounded-[10px] border border-line bg-white object-contain p-[5px]", className)}
+        className={cn("shrink-0 rounded-[10px] border border-line bg-white object-contain p-1", className)}
       />
     );
   const initials = name.replace(/[^A-Za-z0-9 ]/g, "").split(" ").filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase() || "?";

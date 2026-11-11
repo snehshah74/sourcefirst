@@ -15,7 +15,7 @@ export default function UserMenu({ name, email }: { name: string; email: string 
     <Dropdown.Root>
       <Dropdown.Trigger
         aria-label="Account menu"
-        className="grid h-9 w-9 place-items-center rounded-full bg-lime text-[13px] font-bold text-lime-fg outline-none ring-offset-2 ring-offset-ink hover:bg-lime-hover focus-visible:ring-2 focus-visible:ring-lime"
+        className="grid h-9 w-9 place-items-center rounded-full bg-ink-3 text-[13px] font-medium text-ink-fg outline-none ring-1 ring-ink-line ring-offset-2 ring-offset-ink hover:bg-ink-line focus-visible:ring-2 focus-visible:ring-ink-fg"
       >
         {initials || "?"}
       </Dropdown.Trigger>

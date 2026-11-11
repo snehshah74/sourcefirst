@@ -77,7 +77,11 @@ const CATEGORIES: [string, RegExp][] = [
 
 const PRIORITY = ["Finance & Legal", "People"]; // "Financial Analyst", "People Analytics" are not data roles
 
+/** Product management titles often mention another field ("Product Manager, Data"), so these are settled first. */
+const PRODUCT_ROLE = /\b(product (manager|management|owner)|(head|director|vp|vice president|chief)\W+(of\W+)?product\b(?!\W+(marketing|design)))/i;
+
 function categorize(title: string, dept: string | null): string {
+  if (PRODUCT_ROLE.test(title) && !/\b(recruit\w*|sourcer|talent)\b/i.test(title)) return "Product";
   if (!/\bengineer/i.test(title)) for (const [name, re] of CATEGORIES) if (PRIORITY.includes(name) && re.test(title)) return name;
   for (const [name, re] of CATEGORIES) if (re.test(title)) return name;
   if (dept) for (const [name, re] of CATEGORIES) if (re.test(dept)) return name;

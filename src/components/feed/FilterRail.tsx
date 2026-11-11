@@ -35,7 +35,7 @@ function Box({ checked, radio }: { checked: boolean; radio?: boolean }) {
 
 function Row({ checked, onClick, radio, children }: { checked: boolean; onClick: () => void; radio?: boolean; children: React.ReactNode }) {
   return (
-    <button type="button" role={radio ? "radio" : "checkbox"} aria-checked={checked} onClick={onClick} className="group flex w-full items-center gap-3 py-[7px] text-left text-[14.5px]">
+    <button type="button" role={radio ? "radio" : "checkbox"} aria-checked={checked} onClick={onClick} className="group flex w-full items-center gap-3 py-2 text-left text-[14.5px]">
       <Box checked={checked} radio={radio} />
       <span className={checked ? "font-medium text-fg" : "text-fg/80"}>{children}</span>
     </button>
@@ -67,7 +67,7 @@ export function FilterRail({ companyName }: { companyName?: string | null }) {
   return (
     <div>
       <div className="mb-4 flex items-baseline justify-between">
-        <h2 className="font-display text-[22px] font-semibold tracking-tight">Filters</h2>
+        <h2 className="font-display text-[22px] font-medium tracking-tight">Filters</h2>
         {active && (
           <button type="button" onClick={() => update({ ...Object.fromEntries(RAIL_PARAMS.map((k) => [k, null])), job: null })} className="text-sm text-muted underline-offset-2 hover:text-fg hover:underline">
             Clear

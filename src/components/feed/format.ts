@@ -13,6 +13,12 @@ export function ago(iso: string | Date | null | undefined, now: number, long = f
 
 export const isFresh = (iso: string | Date, now: number, hours = 3) => now > 0 && now - new Date(iso).getTime() < hours * 3600_000;
 
+/** "SENIOR SOFTWARE ENGINEER, AI" → "Senior Software Engineer, AI". Mixed-case titles are left alone. */
+export function cleanTitle(t: string): string {
+  if (!/[A-Z]{4}/.test(t) || t !== t.toUpperCase()) return t;
+  return t.replace(/[A-Z][A-Z'’]*/g, (w) => (w.length <= 3 && w !== "AND" && w !== "THE" && w !== "FOR" ? w : w[0] + w.slice(1).toLowerCase()));
+}
+
 /** "San Francisco, CA | New York City, NY | Seattle, WA" → { first: "San Francisco, CA", extra: 2 } */
 export function splitLocations(loc: string): { first: string; extra: number; all: string[] } {
   const all = loc

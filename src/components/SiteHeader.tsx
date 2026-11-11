@@ -10,18 +10,18 @@ export default async function SiteHeader() {
   return (
     <>
       <header className="sticky top-0 z-30 h-16 border-b border-ink-line bg-ink text-ink-fg">
-        <div className="mx-auto flex h-full max-w-[1320px] items-center gap-8 px-4 sm:px-6">
-          <Logo tone="ink" />
-          <NavLinks className="hidden sm:flex" />
+        <div className="mx-auto flex h-full max-w-[1320px] items-center gap-6 px-4 sm:px-6">
+          <Logo />
+          <NavLinks className="hidden md:flex" />
           <div className="ml-auto flex items-center gap-2">
             <div className="hidden md:block"><ThemeToggle tone="ink" /></div>
             {user ? (
               <UserMenu name={user.name || user.email} email={user.email} />
             ) : (
               <>
-                <Link href="/sign-in" className="hidden whitespace-nowrap rounded-full px-3.5 py-2 text-sm font-medium text-ink-muted hover:text-ink-fg sm:inline-flex">Sign in</Link>
-                <Link href="/sign-up" className="whitespace-nowrap rounded-full bg-lime px-4 py-2 text-sm font-semibold text-lime-fg hover:bg-lime-hover">
-                  Sign up<span className="hidden sm:inline"> free</span>
+                <Link href="/sign-in" className="hidden h-9 items-center whitespace-nowrap px-3 text-sm font-medium text-ink-muted transition-colors hover:text-ink-fg sm:inline-flex">Sign in</Link>
+                <Link href="/sign-up" className="inline-flex h-9 items-center whitespace-nowrap rounded-[10px] bg-ink-fg px-4 text-sm font-medium text-ink transition-colors hover:bg-white">
+                  Sign up<span className="hidden sm:inline">&nbsp;free</span>
                 </Link>
               </>
             )}

@@ -133,6 +133,17 @@ export async function topCompanies(limit = 40) {
     .limit(limit);
 }
 
+/** The most recently found open roles, for the live log on the home page. */
+export async function latestJobs(limit = 5) {
+  const db = await getDb();
+  return db
+    .select({ id: jobs.id, title: jobs.title, company_name: jobs.company_name, company_domain: jobs.company_domain, first_seen_at: jobs.first_seen_at })
+    .from(jobs)
+    .where(isNull(jobs.closed_at))
+    .orderBy(desc(jobs.first_seen_at), desc(jobs.id))
+    .limit(limit);
+}
+
 /** Every company with open roles, biggest first (for the /companies directory). */
 export async function allCompanies() {
   const db = await getDb();

@@ -8,7 +8,7 @@ import { CompanyLogo } from "./ui/CompanyLogo";
 import { Button, buttonClass } from "./ui/Button";
 import { toast } from "./ui/Toaster";
 import { cn } from "./ui/cn";
-import { ago, splitLocations } from "./feed/format";
+import { ago, cleanTitle, splitLocations } from "./feed/format";
 
 const DOT: Record<Status, string> = {
   Saved: "bg-subtle",
@@ -21,7 +21,7 @@ const HINT: Record<Status, string> = {
   Saved: "Jobs you want to apply to",
   Applied: "Waiting to hear back",
   Interviewing: "In the process",
-  Offer: "🎉",
+  Offer: "Time to decide",
   Rejected: "On to the next one",
 };
 
@@ -47,7 +47,7 @@ function Card({ t, now, onStatus, onNotes, onRemove, draggable }: {
         <CompanyLogo name={t.job.company_name} domain={t.job.company_domain} size={32} className="!rounded-lg !p-1" />
         <div className="min-w-0 flex-1">
           <Link href={`/?job=${encodeURIComponent(t.jobId)}`} className="line-clamp-2 text-sm font-semibold leading-snug hover:text-accent">
-            {t.job.title}
+            {cleanTitle(t.job.title)}
           </Link>
           <div className="mt-0.5 truncate text-xs text-muted">
             {t.job.company_name} · {splitLocations(t.job.location).first}

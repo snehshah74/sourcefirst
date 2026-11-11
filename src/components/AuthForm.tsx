@@ -21,7 +21,9 @@ const TITLES: Record<Mode, string> = {
 export default function AuthForm({ mode, googleEnabled = false }: { mode: Mode; googleEnabled?: boolean }) {
   const router = useRouter();
   const sp = useSearchParams();
-  const next = sp.get("next")?.startsWith("/") ? sp.get("next")! : "/";
+  // Only same-site paths: "//evil.com" and "/\evil.com" would leave the site.
+  const raw = sp.get("next") ?? "";
+  const next = /^\/(?![/\\])/.test(raw) ? raw : "/";
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);

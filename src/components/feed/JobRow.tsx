@@ -6,7 +6,7 @@ import type { JobRow as Job } from "@/lib/types";
 import { Badge } from "@/components/ui/Badge";
 import { CompanyLogo } from "@/components/ui/CompanyLogo";
 import { cn } from "@/components/ui/cn";
-import { ago, formatSalary, isFresh, splitLocations } from "./format";
+import { ago, cleanTitle, formatSalary, isFresh, splitLocations } from "./format";
 
 export const JobRow = memo(function JobRow({
   job,
@@ -53,14 +53,13 @@ export const JobRow = memo(function JobRow({
               }}
               className="line-clamp-2 text-[15px] font-semibold leading-snug text-fg outline-none"
             >
-              {job.title}
+              {cleanTitle(job.title)}
             </a>
           </h3>
           <span
-            className={cn("mt-0.5 shrink-0 text-xs tabular-nums", fresh ? "font-semibold text-accent" : "text-subtle")}
+            className={cn("mt-0.5 shrink-0 font-mono text-xs tabular-nums", fresh ? "text-accent" : "text-subtle")}
             title={`Discovered ${new Date(job.first_seen_at).toLocaleString()}`}
           >
-            {fresh && <span className="live-dot mr-1 inline-block h-1.5 w-1.5 rounded-full bg-accent align-middle" />}
             {ago(job.first_seen_at, now)}
           </span>
         </div>

@@ -10,7 +10,7 @@ import { CompanyLogo } from "@/components/ui/CompanyLogo";
 import { toast } from "@/components/ui/Toaster";
 import { cn } from "@/components/ui/cn";
 import { STATUSES, type Status } from "@/lib/tracker";
-import { ago, ATS_LABEL, formatSalary, splitLocations, VISA_LABEL } from "./format";
+import { ago, ATS_LABEL, cleanTitle, formatSalary, splitLocations, VISA_LABEL } from "./format";
 
 interface Detail {
   job: Job & { published_at: string | null };
@@ -29,7 +29,7 @@ function Fact({ icon: Icon, label, value, tone }: { icon: typeof MapPin; label: 
     <div className="flex min-w-0 gap-2 rounded-xl bg-surface-2 px-2.5 py-2 sm:gap-2.5 sm:px-3 sm:py-2.5">
       <Icon size={16} className={cn("mt-0.5 shrink-0", tone === "accent" ? "text-accent" : tone === "danger" ? "text-danger" : "text-subtle")} />
       <div className="min-w-0">
-        <div className="text-[11px] font-medium uppercase tracking-wide text-subtle">{label}</div>
+        <div className="text-xs text-subtle">{label}</div>
         <div className="text-[13.5px] font-medium leading-snug text-fg">{value}</div>
       </div>
     </div>
@@ -207,7 +207,7 @@ export function JobDetail({
   );
 
   return (
-    <article className="flex min-h-full flex-col" aria-label={job.title}>
+    <article className="flex min-h-full flex-col" aria-label={cleanTitle(job.title)}>
       <header className="space-y-4 border-b border-line p-5 sm:p-6">
         <div className="flex items-start gap-3.5">
           <CompanyLogo name={job.company_name} domain={job.company_domain} size={52} />
@@ -215,7 +215,7 @@ export function JobDetail({
             <a href={`/companies/${job.company_slug}`} className="text-sm font-medium text-muted hover:text-accent hover:underline" title={`About ${job.company_name}`}>
               {job.company_name}
             </a>
-            <h2 className="mt-0.5 font-display text-[22px] font-semibold leading-tight tracking-tight text-fg sm:text-[26px]">{job.title}</h2>
+            <h2 className="mt-0.5 font-display text-[22px] font-medium leading-tight tracking-tight text-fg sm:text-[26px]">{cleanTitle(job.title)}</h2>
             <p className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-muted">
               <span className="inline-flex items-center gap-1"><MapPin size={13} />{loc.first}{loc.extra > 0 && ` +${loc.extra} more`}</span>
               <span className="text-subtle">·</span>
@@ -308,7 +308,7 @@ export function JobDetail({
                 <li key={m.id}>
                   <button type="button" onClick={() => onSelect(m.id)} className="flex w-full items-center gap-3 px-3.5 py-2.5 text-left hover:bg-surface-2">
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-medium">{m.title}</span>
+                      <span className="block truncate text-sm font-medium">{cleanTitle(m.title)}</span>
                       <span className="block truncate text-xs text-muted">{splitLocations(m.location).first}</span>
                     </span>
                     <span className="shrink-0 text-xs text-subtle">{ago(m.first_seen_at, now)}</span>

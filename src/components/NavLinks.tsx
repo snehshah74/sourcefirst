@@ -22,7 +22,7 @@ export function NavLinks({ className }: { className?: string }) {
             key={href}
             href={href}
             aria-current={active ? "page" : undefined}
-            className={cn("rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors", active ? "bg-ink-3 text-ink-fg" : "text-ink-muted hover:text-ink-fg")}
+            className={cn("rounded-lg px-3 py-1.5 text-sm font-medium transition-colors", active ? "bg-ink-3 text-ink-fg" : "text-ink-muted hover:text-ink-fg")}
           >
             {label}
           </Link>
@@ -37,13 +37,13 @@ export function MobileTabBar({ signedIn }: { signedIn: boolean }) {
   const path = usePathname();
   const items = signedIn ? LINKS : [...LINKS.slice(0, 3), { href: "/sign-in", label: "Sign in", icon: UserRound }];
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-bg/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-md sm:hidden" aria-label="Primary">
+    <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-bg/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-md md:hidden" aria-label="Primary">
       <div className="grid grid-cols-4">
         {items.map(({ href, label, icon: Icon }) => {
           const active = href === "/" ? path === "/" : path.startsWith(href);
           return (
             <Link key={label} href={href} className={cn("flex flex-col items-center gap-0.5 py-2 text-[11px] font-medium", active ? "text-accent" : "text-subtle")}>
-              <Icon size={20} strokeWidth={active ? 2.4 : 2} />
+              <Icon size={20} strokeWidth={1.5} />
               {label}
             </Link>
           );

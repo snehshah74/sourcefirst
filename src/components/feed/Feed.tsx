@@ -9,6 +9,7 @@ import { useTracker, type Status } from "@/lib/tracker";
 import { Button } from "@/components/ui/Button";
 import { toast } from "@/components/ui/Toaster";
 import { cn } from "@/components/ui/cn";
+import Link from "next/link";
 import { SearchDeck } from "./SearchDeck";
 import { FilterRail, RAIL_PARAMS } from "./FilterRail";
 import { JobCard, JobCardSkeleton } from "./JobCard";
@@ -66,7 +67,7 @@ const typing = (el: EventTarget | null) => {
 export default function Feed({ signedIn, hero }: { signedIn: boolean; hero?: React.ReactNode }) {
   const router = useRouter();
   const { get, list, update } = useUrlState();
-  const feed = useFeed();
+  const feed = useFeed(!signedIn);
   const tracker = useTracker(signedIn);
   const [view, setView] = useView();
   const wide = useMedia("(min-width: 1280px)");
@@ -328,15 +329,14 @@ export default function Feed({ signedIn, hero }: { signedIn: boolean; hero?: Rea
         <section aria-label="Job results" className="min-w-0">
           <div className="mb-5 flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
             <div className="min-w-0">
-              <h2 className="truncate font-display text-[28px] font-semibold leading-tight tracking-tight sm:text-[32px]">{heading}</h2>
+              <h2 className="truncate font-display text-[28px] font-medium leading-tight tracking-tight sm:text-[32px]">{heading}</h2>
               <p className="mt-1 flex items-center gap-1.5 text-sm text-muted">
-                <span className="live-dot h-1.5 w-1.5 rounded-full bg-accent" />
                 {feed.total === null ? "Loading…" : `${feed.total.toLocaleString()} open ${feed.total === 1 ? "role" : "roles"}`}
                 {feed.lastRun && <span className="text-subtle">· boards checked {ago(feed.lastRun, feed.now, true)}</span>}
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <label className="flex h-10 items-center gap-2 rounded-full border border-line bg-surface pl-4 pr-2 text-sm shadow-sm">
+              <label className="flex h-9 items-center gap-2 rounded-[10px] border border-line bg-surface pl-3 pr-2 text-sm">
                 <span className="text-subtle">Sort</span>
                 <select
                   value={get("sort") === "salary" ? "salary" : "new"}
@@ -347,7 +347,7 @@ export default function Feed({ signedIn, hero }: { signedIn: boolean; hero?: Rea
                   <option value="salary">Highest salary</option>
                 </select>
               </label>
-              <div role="radiogroup" aria-label="Layout" className="flex h-10 items-center rounded-full border border-line bg-surface p-1 shadow-sm">
+              <div role="radiogroup" aria-label="Layout" className="flex h-9 items-center rounded-[10px] border border-line bg-surface p-0.5">
                 {([
                   ["cards", LayoutGrid, "Cards"],
                   ["list", Rows3, "List"],
@@ -360,9 +360,9 @@ export default function Feed({ signedIn, hero }: { signedIn: boolean; hero?: Rea
                     aria-label={`${label} view`}
                     title={`${label} view`}
                     onClick={() => setView(v)}
-                    className={cn("grid h-8 w-9 place-items-center rounded-full transition-colors", view === v ? "bg-primary text-primary-fg" : "text-subtle hover:text-fg")}
+                    className={cn("grid h-8 w-9 place-items-center rounded-lg transition-colors", view === v ? "bg-primary text-primary-fg" : "text-subtle hover:text-fg")}
                   >
-                    <Icon size={16} />
+                    <Icon size={16} strokeWidth={1.5} />
                   </button>
                 ))}
               </div>
@@ -376,7 +376,7 @@ export default function Feed({ signedIn, hero }: { signedIn: boolean; hero?: Rea
                 feed.showPending();
                 document.querySelector('[aria-label="Job results"]')?.scrollIntoView({ behavior: "smooth" });
               }}
-              className="fade-up mb-4 flex w-full items-center justify-center gap-2 rounded-full bg-ink py-3 text-sm font-semibold text-ink-fg hover:bg-ink-3"
+              className="fade-up mb-4 flex w-full items-center justify-center gap-2 rounded-xl bg-ink py-3 text-sm font-medium text-ink-fg transition-colors hover:bg-ink-3"
             >
               <ArrowUp size={15} className="text-lime" />
               {feed.pendingCount >= 30 ? "30+" : feed.pendingCount} new {feed.pendingCount === 1 ? "job" : "jobs"} just found. Show {feed.pendingCount === 1 ? "it" : "them"}
@@ -406,7 +406,19 @@ export default function Feed({ signedIn, hero }: { signedIn: boolean; hero?: Rea
               <Loader2 size={15} className="animate-spin" /> Loading more…
             </div>
           )}
-          {!feed.loading && !feed.hasMore && feed.jobs.length > 0 && (
+          {!signedIn && !feed.loading && feed.total !== null && feed.total > feed.jobs.length && (
+            <div className="mt-4 flex flex-col items-start justify-between gap-5 rounded-3xl bg-ink p-6 text-ink-fg sm:flex-row sm:items-center sm:p-8">
+              <div>
+                <h3 className="font-display text-[24px] font-medium tracking-tight">{(feed.total - feed.jobs.length).toLocaleString()} more roles match this search</h3>
+                <p className="mt-1 text-[15px] text-ink-muted">Sign up free to see all of them, save jobs and get alerts</p>
+              </div>
+              <div className="flex shrink-0 items-center gap-2">
+                <Link href={`/sign-in?next=${encodeURIComponent(`/?${feed.query}`)}`} className="inline-flex h-11 items-center rounded-xl px-4 text-sm font-medium text-ink-muted transition-colors hover:text-ink-fg">Sign in</Link>
+                <Link href={`/sign-up?next=${encodeURIComponent(`/?${feed.query}`)}`} className="inline-flex h-11 items-center rounded-xl bg-ink-fg px-5 text-sm font-medium text-ink transition-colors hover:bg-white">Sign up free</Link>
+              </div>
+            </div>
+          )}
+          {!feed.loading && !feed.hasMore && feed.jobs.length > 0 && (signedIn || feed.total === feed.jobs.length) && (
             <p className="py-8 text-center text-sm text-subtle">That&apos;s every open role matching your filters.</p>
           )}
         </section>

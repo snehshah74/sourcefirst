@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
-import { Check, Globe2, MapPin, Plane, Sparkles, Wifi, X } from "lucide-react";
+import { Check, Globe2, MapPin, Plane, SlidersHorizontal, Wifi, X } from "lucide-react";
 import { LEVEL_OPTIONS, ROLE_OPTIONS, type Prefs } from "@/lib/prefs";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/components/ui/cn";
@@ -80,7 +80,7 @@ export function Onboarding({
           className="sheet-in fixed inset-x-0 bottom-0 z-50 flex max-h-[92dvh] flex-col rounded-t-2xl border border-line bg-surface shadow-lg outline-none sm:inset-auto sm:left-1/2 sm:top-1/2 sm:w-[560px] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-2xl"
         >
           <header className="flex items-start gap-3 border-b border-line p-5">
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent"><Sparkles size={19} /></span>
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent"><SlidersHorizontal size={18} strokeWidth={1.5} /></span>
             <div className="flex-1">
               <Dialog.Title className="text-lg font-semibold tracking-tight">What are you looking for?</Dialog.Title>
               <Dialog.Description className="text-sm text-muted">We&apos;ll tailor the feed. Change it any time from “For you”.</Dialog.Description>

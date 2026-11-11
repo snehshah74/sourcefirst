@@ -1,25 +1,24 @@
 import Link from "next/link";
 import { cn } from "./cn";
 
-/** `ink`: for the dark header (lime mark). Default: for light surfaces (green mark). */
-function LogoMark({ size = 28, tone = "default" }: { size?: number; tone?: "ink" | "default" }) {
-  const bg = tone === "ink" ? "var(--lime)" : "var(--accent)";
-  const fg = tone === "ink" ? "var(--lime-fg)" : "var(--accent-fg)";
+/**
+ * The origin point: a lime signal at the source with a ring around it. The ring follows the text color
+ * and the dot keeps an ink edge, so the same mark reads on the ink header and on light pages.
+ */
+function LogoMark({ size = 24 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden>
-      <rect width="32" height="32" rx="10" fill={bg} />
-      <path d="M10 21.5 21.5 10M13.5 10h8v8" stroke={fg} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden className="shrink-0">
+      <circle cx="12" cy="12" r="10.75" fill="none" stroke="currentColor" strokeWidth="1.5" opacity="0.35" />
+      <circle cx="12" cy="12" r="5.5" fill="var(--lime)" stroke="#0e0f12" strokeWidth="1" />
     </svg>
   );
 }
 
-export function Logo({ className, tone = "default" }: { className?: string; tone?: "ink" | "default" }) {
+export function Logo({ className }: { className?: string }) {
   return (
-    <Link href="/" className={cn("inline-flex items-center gap-2.5", className)} aria-label="SourceFirst home">
-      <LogoMark tone={tone} />
-      <span className="font-display text-[19px] font-semibold tracking-tight">
-        Source<span className={tone === "ink" ? "text-lime" : "text-accent"}>First</span>
-      </span>
+    <Link href="/" className={cn("inline-flex items-center gap-2", className)} aria-label="SourceFirst home">
+      <LogoMark />
+      <span className="font-display text-[18px] font-medium tracking-tight">SourceFirst</span>
     </Link>
   );
 }

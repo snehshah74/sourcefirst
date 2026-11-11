@@ -12,13 +12,13 @@ const FAQ = [
 
 export default function SiteFooter() {
   return (
-    <footer className="mt-10 border-t border-line bg-surface pb-24 sm:pb-0">
+    <footer className="mt-10 border-t border-line bg-surface pb-24 md:pb-0">
       <div className="mx-auto grid max-w-[1320px] gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[1fr_1.4fr]">
         <div className="space-y-6">
           <Logo />
           <p className="max-w-sm text-sm text-muted">Jobs straight from company career pages, minutes after they&apos;re posted.</p>
           <div>
-            <h2 className="mb-2.5 text-xs font-semibold uppercase tracking-wide text-subtle">Browse</h2>
+            <h2 className="mb-2.5 text-sm font-medium text-subtle">Browse</h2>
             <ul className="grid grid-cols-1 gap-x-6 gap-y-1.5 text-sm min-[420px]:grid-cols-2">
               {LANDINGS.map((l) => (
                 <li key={l.slug}><Link href={`/jobs/${l.slug}`} className="text-muted hover:text-fg">{l.h1}</Link></li>
@@ -27,7 +27,7 @@ export default function SiteFooter() {
           </div>
         </div>
         <div id="faq">
-          <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-subtle">Questions</h2>
+          <h2 className="mb-3 text-sm font-medium text-subtle">Questions</h2>
           <div className="divide-y divide-line rounded-2xl border border-line">
             {FAQ.map(([q, a]) => (
               <details key={q} className="group px-4 py-3.5">
@@ -55,7 +55,7 @@ export default function SiteFooter() {
         <div className="mx-auto flex max-w-[1320px] flex-wrap items-center gap-x-4 gap-y-1 px-4 py-4 text-xs text-subtle sm:px-6">
           <span>© {new Date().getFullYear()} SourceFirst</span>
           <Link href="/status" className="hover:text-fg">Pipeline status</Link>
-          <span className="ml-auto">Data from public company career pages. Always apply on the employer&apos;s site.</span>
+          <span className="w-full sm:ml-auto sm:w-auto">Data from public company career pages. Always apply on the employer&apos;s site.</span>
         </div>
       </div>
     </footer>

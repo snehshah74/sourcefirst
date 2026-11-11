@@ -37,7 +37,7 @@ export function ThemeToggle({ className, tone = "default" }: { className?: strin
     ["dark", Moon, "Dark"],
   ];
   return (
-    <div role="radiogroup" aria-label="Theme" className={cn("inline-flex rounded-full border p-0.5", tone === "ink" ? "border-ink-line bg-ink-2" : "border-line bg-surface", className)}>
+    <div role="radiogroup" aria-label="Theme" className={cn("inline-flex rounded-[10px] border p-0.5", tone === "ink" ? "border-ink-line bg-ink-2" : "border-line bg-surface", className)}>
       {opts.map(([t, Icon, label]) => (
         <button
           key={t}
@@ -47,7 +47,7 @@ export function ThemeToggle({ className, tone = "default" }: { className?: strin
           title={label}
           onClick={() => set(t)}
           className={cn(
-            "grid h-7 w-7 place-items-center rounded-full transition-colors",
+            "grid h-7 w-7 place-items-center rounded-lg transition-colors",
             tone === "ink" ? (theme === t ? "bg-ink-3 text-ink-fg" : "text-ink-muted hover:text-ink-fg") : theme === t ? "bg-surface-3 text-fg" : "text-subtle hover:text-fg",
           )}
         >

@@ -45,7 +45,7 @@ interface Page {
   total: number;
 }
 
-export function useFeed() {
+export function useFeed(guest: boolean) {
   const { sp } = useUrlState();
   const query = useMemo(() => feedQuery(sp), [sp]);
 
@@ -73,7 +73,7 @@ export function useFeed() {
   }, [query]);
 
   const loadMore = useCallback(async () => {
-    if (!state || loadingMore || state.jobs.length >= state.total) return;
+    if (guest || !state || loadingMore || state.jobs.length >= state.total) return;
     setLoadingMore(true);
     try {
       const d: Page = await fetch(`/api/jobs?${state.query}&pageSize=${PAGE}&page=${state.page + 1}`).then((r) => r.json());
@@ -85,7 +85,7 @@ export function useFeed() {
     } finally {
       setLoadingMore(false);
     }
-  }, [state, loadingMore]);
+  }, [guest, state, loadingMore]);
 
   // Live updates: check every 60s (and when the tab comes back) for newly discovered jobs.
   const stateRef = useRef(state);
@@ -153,7 +153,7 @@ export function useFeed() {
     stale: state && !ready ? state.jobs : null, // previous results, dimmed while the new ones load
     loading: !ready,
     loadingMore,
-    hasMore: ready && state!.jobs.length < state!.total,
+    hasMore: !guest && ready && state!.jobs.length < state!.total,
     loadMore,
     now: state?.now ?? 0,
     lastRun,
