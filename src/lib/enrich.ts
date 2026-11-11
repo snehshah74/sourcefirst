@@ -46,13 +46,13 @@ const VISA_YES = [
   /\bimmigration support\b/i,
 ];
 
-export function classifyVisa(text: string): Visa {
+function classifyVisa(text: string): Visa {
   if (VISA_NO.some((r) => r.test(text))) return "No";
   if (VISA_YES.some((r) => r.test(text))) return "Yes";
   return "Maybe";
 }
 
-export function extractMinExp(text: string): number | null {
+function extractMinExp(text: string): number | null {
   const m =
     text.match(/(\d{1,2})\s*\+?\s*(?:-|–|to)?\s*(?:\d{1,2}\s*)?\+?\s*years?(?:\s+of)?(?:\s+\w+){0,4}\s+experience/i) ??
     text.match(/experience[^.]{0,40}?(\d{1,2})\s*\+?\s*years?/i);
@@ -76,7 +76,7 @@ const CATEGORIES: [string, RegExp][] = [
 
 const PRIORITY = ["Finance & Legal", "People"]; // "Financial Analyst", "People Analytics" are not data roles
 
-export function categorize(title: string, dept: string | null): string {
+function categorize(title: string, dept: string | null): string {
   if (!/\bengineer/i.test(title)) for (const [name, re] of CATEGORIES) if (PRIORITY.includes(name) && re.test(title)) return name;
   for (const [name, re] of CATEGORIES) if (re.test(title)) return name;
   if (dept) for (const [name, re] of CATEGORIES) if (re.test(dept)) return name;
@@ -84,7 +84,7 @@ export function categorize(title: string, dept: string | null): string {
   return "Other";
 }
 
-export function seniority(title: string, employmentType: string | null): string {
+function seniority(title: string, employmentType: string | null): string {
   if (/\b(intern|internship)\b/i.test(title) || /intern/i.test(employmentType ?? "")) return "Intern";
   if (/\b(new grad|graduate|entry[- ]level|junior|jr\.?|associate)\b/i.test(title)) return "Entry";
   if (/\b(vp|vice president|head of|chief|director|cto|ceo|cfo)\b/i.test(title)) return "Director+";

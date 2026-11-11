@@ -4,7 +4,7 @@ import type { JobRow } from "./types";
 
 const { jobs, companies, runs, hiddenJobs } = schema;
 
-export interface JobFilters {
+interface JobFilters {
   q?: string;
   ats?: string[];
   visa?: string[];
@@ -45,7 +45,7 @@ export function parseFilters(sp: URLSearchParams): JobFilters {
 }
 
 /** The filter keys that define a search (what a saved search stores). */
-export const FILTER_KEYS = ["q", "ats", "visa", "category", "seniority", "remote", "us", "maxExp", "company", "sort"] as const;
+const FILTER_KEYS = ["q", "ats", "visa", "category", "seniority", "remote", "us", "maxExp", "company", "sort"] as const;
 
 export function canonicalQuery(sp: URLSearchParams): string {
   const out = new URLSearchParams();

@@ -5,7 +5,7 @@
  *  - RESEND_API_KEY         → Resend (free 3,000/month, but needs a verified domain to email others).
  *  - neither (local dev)    → messages are printed to the server log so every flow stays testable.
  */
-export interface Mail {
+interface Mail {
   to: string;
   subject: string;
   html: string;
@@ -15,7 +15,7 @@ export interface Mail {
 
 type Provider = "smtp" | "resend" | "log";
 
-export function emailProvider(): Provider {
+function emailProvider(): Provider {
   if (process.env.SMTP_USER && process.env.SMTP_PASS) return "smtp";
   if (process.env.RESEND_API_KEY) return "resend";
   return "log";

@@ -44,7 +44,3 @@ export function formatSalary(raw: string | null): string | null {
 export const VISA_LABEL: Record<string, string> = { Yes: "Sponsors visa", No: "No sponsorship", Maybe: "Not stated" };
 
 export const ATS_LABEL: Record<string, string> = { greenhouse: "Greenhouse", lever: "Lever", ashby: "Ashby" };
-
-export function compactNumber(n: number) {
-  return n >= 10_000 ? `${(n / 1000).toFixed(n >= 100_000 ? 0 : 1).replace(/\.0$/, "")}k` : n.toLocaleString();
-}

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { cn } from "./cn";
 
-export function LogoMark({ size = 26, className }: { size?: number; className?: string }) {
+function LogoMark({ size = 26, className }: { size?: number; className?: string }) {
   return (
     <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden className={className}>
       <rect width="32" height="32" rx="9" fill="var(--accent)" />

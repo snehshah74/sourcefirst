@@ -2,6 +2,8 @@ import path from "node:path";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Don't generate AGENTS.md (AI-assistant notes) in the project.
+  agentRules: false,
   // PGlite loads its WASM/data files from its own package dir; pg has optional native deps.
   serverExternalPackages: ["@electric-sql/pglite", "pg"],
   turbopack: {

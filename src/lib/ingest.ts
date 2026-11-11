@@ -6,7 +6,7 @@ import { enrich } from "./enrich";
 
 const { jobs, companies, runs } = schema;
 
-export interface IngestResult {
+interface IngestResult {
   runId: number | null;
   skipped?: string;
   companiesOk: number;

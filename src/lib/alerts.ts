@@ -131,7 +131,7 @@ function jobCard(j: JobRow) {
   </td></tr>`;
 }
 
-export function renderHtml(name: string, total: number, sections: Section[]) {
+function renderHtml(name: string, total: number, sections: Section[]) {
   const first = name.split(" ")[0] || "there";
   const body = sections
     .map(

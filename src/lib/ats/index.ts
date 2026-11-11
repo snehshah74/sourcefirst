@@ -3,7 +3,7 @@ import type { RawJob } from "../types";
 
 const UA = "SourceFirst-JobAggregator/0.1 (+https://github.com/)";
 
-export class FetchError extends Error {
+class FetchError extends Error {
   constructor(message: string, public status?: number) {
     super(message);
   }
@@ -46,7 +46,7 @@ export function decodeEntities(s: string): string {
   });
 }
 
-export function htmlToText(html: string | null | undefined): string {
+function htmlToText(html: string | null | undefined): string {
   if (!html) return "";
   // Greenhouse double-encodes its HTML, so decode before stripping tags.
   const decoded = decodeEntities(html);
@@ -172,7 +172,7 @@ async function ashby(c: Company): Promise<RawJob[]> {
     }));
 }
 
-export const FETCHERS = { greenhouse, lever, ashby } as const;
+const FETCHERS = { greenhouse, lever, ashby } as const;
 
 /** Returns the board's open jobs, or throws FetchError. */
 export function fetchCompanyJobs(c: Company): Promise<RawJob[]> {

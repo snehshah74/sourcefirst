@@ -1,5 +1,5 @@
 /** Programmatic SEO landing pages, one per common search. Add rows to add pages. */
-export interface Landing {
+interface Landing {
   slug: string;
   h1: string;
   blurb: string;
