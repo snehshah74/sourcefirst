@@ -1,4 +1,5 @@
-# Checks every push and pull request: types, lint, tests and a production build.
+# Checks every push and pull request: lint, tests and a production build (which also type-checks,
+# after generating the route types a plain `tsc` on a fresh checkout wouldn't have).
 # The tests use a throwaway embedded database, so no secrets are needed here.
 name: ci
 
@@ -25,7 +26,6 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci --no-audit --no-fund
-      - run: npx tsc --noEmit
       - run: npm run lint
       - run: npm test
       - run: npm run build
