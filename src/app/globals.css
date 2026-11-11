@@ -88,6 +88,62 @@
   color-scheme: dark;
 }
 
+/* Ink: the dark search band and header (dark in both themes). Lime is only ever used on ink. */
+:root {
+  --ink: #0e0f12;
+  --ink-2: #17191d;
+  --ink-3: #22252b;
+  --ink-line: #2b2e35;
+  --ink-fg: #f4f5f7;
+  --ink-muted: #9ba1ab;
+  --lime: #c8f560;
+  --lime-hover: #d8fb86;
+  --lime-fg: #0e0f12;
+  /* Primary actions: ink on light surfaces, lime on dark ones (ink would vanish on dark) */
+  --primary: var(--ink);
+  --primary-hover: var(--ink-3);
+  --primary-fg: var(--ink-fg);
+  /* Soft per-company card tints (picked by hashing the company), light theme */
+  --tint-1: #e3f0fa;
+  --tint-2: #fbe7ee;
+  --tint-3: #fdeadb;
+  --tint-4: #ebe8fb;
+  --tint-5: #e1f4e8;
+  --tint-6: #f5f1d6;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ink: #08090b;
+    --primary: var(--lime);
+    --primary-hover: var(--lime-hover);
+    --primary-fg: var(--lime-fg);
+    --ink-2: #121418;
+    --ink-3: #1c1f24;
+    --ink-line: #262930;
+    --tint-1: #142330;
+    --tint-2: #2a1820;
+    --tint-3: #2b1f15;
+    --tint-4: #1f1b33;
+    --tint-5: #13261b;
+    --tint-6: #26230f;
+  }
+}
+:root[data-theme="dark"] {
+  --ink: #08090b;
+  --primary: var(--lime);
+  --primary-hover: var(--lime-hover);
+  --primary-fg: var(--lime-fg);
+  --ink-2: #121418;
+  --ink-3: #1c1f24;
+  --ink-line: #262930;
+  --tint-1: #142330;
+  --tint-2: #2a1820;
+  --tint-3: #2b1f15;
+  --tint-4: #1f1b33;
+  --tint-5: #13261b;
+  --tint-6: #26230f;
+}
+
 @theme inline {
   --color-bg: var(--bg);
   --color-surface: var(--surface);
@@ -112,6 +168,19 @@
   --shadow-sm: var(--shadow-sm);
   --shadow-md: var(--shadow-md);
   --shadow-lg: var(--shadow-lg);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-ink-line: var(--ink-line);
+  --color-ink-fg: var(--ink-fg);
+  --color-ink-muted: var(--ink-muted);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-fg: var(--primary-fg);
+  --color-lime: var(--lime);
+  --color-lime-hover: var(--lime-hover);
+  --color-lime-fg: var(--lime-fg);
+  --font-display: var(--font-display-face), var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
@@ -169,3 +238,6 @@ body {
 .prose-job :where(strong, b) { font-weight: 600; }
 .prose-job :where(a) { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
 .prose-job :where(hr) { border-color: var(--line); margin: 1.2em 0; }
+
+/* Range slider in the search deck */
+.range-ink { accent-color: var(--lime); }

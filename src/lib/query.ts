@@ -17,6 +17,10 @@ interface JobFilters {
   discoveredAfter?: Date;
   maxExp?: number;
   company?: string;
+  /** text match on location, e.g. "New York" or "Austin" */
+  loc?: string;
+  /** minimum yearly salary (only jobs that list one) */
+  minSalary?: number;
   /** exclude jobs this user marked "not interested" */
   hiddenFor?: string;
   sort?: "new" | "salary";
@@ -38,6 +42,8 @@ export function parseFilters(sp: URLSearchParams): JobFilters {
     sinceHours: num("since"),
     maxExp: num("maxExp"),
     company: sp.get("company") ?? undefined,
+    loc: sp.get("loc")?.slice(0, 80) || undefined,
+    minSalary: num("minSalary"),
     page: num("page"),
     pageSize: num("pageSize"),
     sort: sp.get("sort") === "salary" ? "salary" : undefined,
@@ -45,7 +51,7 @@ export function parseFilters(sp: URLSearchParams): JobFilters {
 }
 
 /** The filter keys that define a search (what a saved search stores). */
-const FILTER_KEYS = ["q", "ats", "visa", "category", "seniority", "remote", "us", "maxExp", "company", "sort"] as const;
+const FILTER_KEYS = ["q", "loc", "minSalary", "ats", "visa", "category", "seniority", "remote", "us", "maxExp", "company", "sort"] as const;
 
 export function canonicalQuery(sp: URLSearchParams): string {
   const out = new URLSearchParams();
@@ -72,6 +78,8 @@ function where(f: JobFilters): SQL | undefined {
   if (f.remote) w.push(eq(jobs.remote, true));
   if (f.usOnly) w.push(eq(jobs.country, "USA"));
   if (f.company) w.push(eq(jobs.company_slug, f.company));
+  if (f.loc) w.push(ilike(jobs.location, `%${f.loc.replace(/[%_\\]/g, (c) => `\\${c}`)}%`));
+  if (f.minSalary) w.push(gte(jobs.salary_min, f.minSalary));
   if (f.sinceHours) w.push(gte(jobs.first_seen_at, new Date(Date.now() - f.sinceHours * 3600_000)));
   if (f.discoveredAfter) w.push(sql`${jobs.first_seen_at} > ${f.discoveredAfter}`);
   if (f.maxExp !== undefined) w.push(or(isNull(jobs.min_exp), lte(jobs.min_exp, f.maxExp)));

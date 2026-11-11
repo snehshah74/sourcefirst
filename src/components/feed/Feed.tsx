@@ -3,13 +3,15 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import * as Dialog from "@radix-ui/react-dialog";
-import { ArrowUp, ArrowUpDown, Loader2, SearchX } from "lucide-react";
+import { ArrowUp, LayoutGrid, Loader2, Rows3, SearchX } from "lucide-react";
 import type { JobRow as Job } from "@/lib/types";
 import { useTracker, type Status } from "@/lib/tracker";
 import { Button } from "@/components/ui/Button";
 import { toast } from "@/components/ui/Toaster";
 import { cn } from "@/components/ui/cn";
-import { FilterBar } from "./FilterBar";
+import { SearchDeck } from "./SearchDeck";
+import { FilterRail, RAIL_PARAMS } from "./FilterRail";
+import { JobCard, JobCardSkeleton } from "./JobCard";
 import { JobRow, JobRowSkeleton } from "./JobRow";
 import { JobDetail } from "./JobDetail";
 import { useFeed, useUrlState } from "./useFeed";
@@ -19,20 +21,41 @@ import { usePrefs } from "./usePrefs";
 import { describePrefs, prefsToQuery, type Prefs } from "@/lib/prefs";
 
 /** URL params that are filters (as opposed to UI state like ?job=). */
-const FILTER_PARAMS = ["q", "since", "visa", "category", "seniority", "ats", "maxExp", "remote", "company", "us", "sort"];
+const FILTER_PARAMS = ["q", "loc", "minSalary", "since", "visa", "category", "seniority", "ats", "maxExp", "remote", "company", "us", "sort"];
 const PREF_PARAMS = ["category", "seniority", "remote", "us", "visa"];
 
-const DESKTOP = "(min-width: 1024px)";
-function useIsDesktop() {
+function useMedia(query: string) {
   return useSyncExternalStore(
     (cb) => {
-      const m = window.matchMedia(DESKTOP);
+      const m = window.matchMedia(query);
       m.addEventListener("change", cb);
       return () => m.removeEventListener("change", cb);
     },
-    () => window.matchMedia(DESKTOP).matches,
-    () => true,
+    () => window.matchMedia(query).matches,
+    () => false,
   );
+}
+
+/** Cards (visual, default) or List (dense, with a preview pane on wide screens); remembered per browser. */
+type View = "cards" | "list";
+const VIEW_KEY = "sf-view";
+const viewListeners = new Set<() => void>();
+function readView(): View {
+  try {
+    return localStorage.getItem(VIEW_KEY) === "list" ? "list" : "cards";
+  } catch {
+    return "cards";
+  }
+}
+function useView(): [View, (v: View) => void] {
+  const view = useSyncExternalStore((cb) => (viewListeners.add(cb), () => viewListeners.delete(cb)), readView, () => "cards" as View);
+  const set = (v: View) => {
+    try {
+      localStorage.setItem(VIEW_KEY, v);
+    } catch {}
+    viewListeners.forEach((l) => l());
+  };
+  return [view, set];
 }
 
 const typing = (el: EventTarget | null) => {
@@ -40,12 +63,16 @@ const typing = (el: EventTarget | null) => {
   return !!t && (["INPUT", "TEXTAREA", "SELECT"].includes(t.tagName) || t.isContentEditable);
 };
 
-export default function Feed({ signedIn }: { signedIn: boolean }) {
+export default function Feed({ signedIn, hero }: { signedIn: boolean; hero?: React.ReactNode }) {
   const router = useRouter();
   const { get, list, update } = useUrlState();
   const feed = useFeed();
   const tracker = useTracker(signedIn);
-  const isDesktop = useIsDesktop();
+  const [view, setView] = useView();
+  const wide = useMedia("(min-width: 1280px)");
+  // The inline preview pane exists only in List view on wide screens; otherwise details open in a drawer.
+  const isDesktop = view === "list" && wide;
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const prefs = usePrefs(signedIn);
   const [editingPrefs, setEditingPrefs] = useState(false);
   // Whether the visitor arrived on a filtered link (then we don't interrupt them with onboarding).
@@ -203,7 +230,7 @@ export default function Feed({ signedIn }: { signedIn: boolean }) {
   // Keyboard: j/k or ↓/↑ move, s saves, Esc closes the mobile sheet.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (typing(e.target) || e.metaKey || e.ctrlKey || e.altKey) return;
+      if (typing(e.target) || e.metaKey || e.ctrlKey || e.altKey || !isDesktop) return;
       const idx = feed.jobs.findIndex((j) => j.id === selRef.current);
       if (e.key === "j" || (e.key === "ArrowDown" && isDesktop)) {
         const next = feed.jobs[Math.min(feed.jobs.length - 1, idx + 1)];
@@ -239,16 +266,6 @@ export default function Feed({ signedIn }: { signedIn: boolean }) {
     return () => io.disconnect();
   }, [feed.loadMore]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Keep the sticky preview just under the sticky filter bar, whatever its height.
-  const bar = useRef<HTMLDivElement>(null);
-  const [barH, setBarH] = useState(120);
-  useEffect(() => {
-    if (!bar.current) return;
-    const ro = new ResizeObserver(([e]) => setBarH(e.target.getBoundingClientRect().height));
-    ro.observe(bar.current);
-    return () => ro.disconnect();
-  }, []);
-
   const companyName = get("company") ? feed.jobs.find((j) => j.company_slug === get("company"))?.company_name ?? null : null;
   const rows = feed.loading ? feed.stale : feed.jobs;
   const detailProps = {
@@ -262,115 +279,139 @@ export default function Feed({ signedIn }: { signedIn: boolean }) {
     onGone: gone,
   };
 
+  const railCount = RAIL_PARAMS.filter((k) => get(k)).length;
+  const reset = () =>
+    update({ q: null, loc: null, minSalary: null, since: null, visa: null, category: null, seniority: null, ats: null, maxExp: null, remote: null, company: null, us: null });
+  const heading = companyName ? `${companyName} jobs` : get("q") ? `“${get("q")}”` : forYouActive ? "Picked for you" : "Fresh jobs";
+
+  const results = feed.error ? (
+    <div className="rounded-3xl border border-line bg-surface p-10 text-center text-sm text-muted">{feed.error}</div>
+  ) : !rows ? (
+    view === "cards" ? (
+      <ul className="grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2 xl:grid-cols-3">{Array.from({ length: 6 }, (_, i) => <JobCardSkeleton key={i} />)}</ul>
+    ) : (
+      <ul className="divide-y divide-line overflow-hidden rounded-3xl border border-line bg-surface">{Array.from({ length: 8 }, (_, i) => <JobRowSkeleton key={i} />)}</ul>
+    )
+  ) : rows.length === 0 && !feed.loading ? (
+    <EmptyState onReset={reset} />
+  ) : view === "cards" ? (
+    <ul className={cn("grid grid-cols-[minmax(0,1fr)] gap-4 transition-opacity sm:grid-cols-2 xl:grid-cols-3", feed.loading && "opacity-50")}>
+      {rows.map((j) => (
+        <JobCard key={j.id} job={j} now={feed.now} status={tracker.items[j.id]?.status} onOpen={select} onToggleSave={toggleSave} onHide={hide} />
+      ))}
+    </ul>
+  ) : (
+    <ul className={cn("divide-y divide-line overflow-hidden rounded-3xl border border-line bg-surface shadow-sm transition-opacity", feed.loading && "opacity-50")}>
+      {rows.map((j) => (
+        <JobRow key={j.id} job={j} now={feed.now} selected={isDesktop && j.id === selectedId} status={tracker.items[j.id]?.status} onSelect={select} onToggleSave={toggleSave} onHide={hide} />
+      ))}
+    </ul>
+  );
+
   return (
-    <div className="mx-auto w-full max-w-[1320px] px-4 sm:px-6">
-      <div ref={bar} className="sticky top-14 z-20 -mx-4 border-b border-line bg-bg/85 px-4 py-3 backdrop-blur-md sm:-mx-6 sm:px-6">
-        <FilterBar
-          total={feed.total}
-          onCreateAlert={createAlert}
-          companyName={companyName}
-          forYou={{ active: forYouActive, hasPrefs: !!prefs.prefs, onClick: () => setEditingPrefs(true) }}
-        />
-      </div>
+    <>
+      <SearchDeck
+        hero={hero}
+        onCreateAlert={createAlert}
+        onOpenFilters={() => setFiltersOpen(true)}
+        filterCount={railCount}
+        forYou={{ active: forYouActive, hasPrefs: !!prefs.prefs, onClick: () => setEditingPrefs(true) }}
+      />
 
-      <div className="grid gap-5 py-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.12fr)]">
-        {/* ── Results ── */}
-        <section aria-label="Job results" className="min-w-0">
-          <div className="mb-2 flex items-center gap-3 px-1 text-xs text-subtle">
-            <span className="inline-flex min-w-0 items-center gap-1.5 truncate">
-              <span className="live-dot h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
-              {feed.lastRun ? `Checked ${ago(feed.lastRun, feed.now, true)}` : "Live"}
-              {feed.total !== null && <span className="sm:hidden"> · {feed.total.toLocaleString()} jobs</span>}
-            </span>
-            <span className="ml-auto hidden xl:inline">
-              <kbd className="rounded border border-line px-1 font-mono">j</kbd> <kbd className="rounded border border-line px-1 font-mono">k</kbd> browse ·{" "}
-              <kbd className="rounded border border-line px-1 font-mono">s</kbd> save · <kbd className="rounded border border-line px-1 font-mono">x</kbd> hide
-            </span>
-            <label className="relative ml-auto inline-flex shrink-0 items-center gap-1 text-muted xl:ml-0">
-              <ArrowUpDown size={12} />
-              <span className="sr-only">Sort by</span>
-              <select
-                value={get("sort") === "salary" ? "salary" : "new"}
-                onChange={(e) => update({ sort: e.target.value === "salary" ? "salary" : null, job: null })}
-                className="cursor-pointer appearance-none bg-transparent pr-1 font-medium text-muted outline-none hover:text-fg"
-              >
-                <option value="new">Newest first</option>
-                <option value="salary">Highest salary</option>
-              </select>
-            </label>
-          </div>
-
-          <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-sm">
-            {feed.pendingCount > 0 && (
-              <button
-                type="button"
-                onClick={() => {
-                  feed.showPending();
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }}
-                className="fade-up flex w-full items-center justify-center gap-2 border-b border-line bg-accent-soft py-2.5 text-sm font-semibold text-accent-soft-fg hover:brightness-[.98]"
-              >
-                <ArrowUp size={15} />
-                {feed.pendingCount >= 30 ? "30+" : feed.pendingCount} new {feed.pendingCount === 1 ? "job" : "jobs"} just discovered
-              </button>
-            )}
-
-            {feed.error ? (
-              <div className="p-10 text-center text-sm text-muted">{feed.error}</div>
-            ) : !rows ? (
-              <ul className="divide-y divide-line">{Array.from({ length: 8 }, (_, i) => <JobRowSkeleton key={i} />)}</ul>
-            ) : rows.length === 0 && !feed.loading ? (
-              <EmptyState onReset={() => update({ q: null, since: null, visa: null, category: null, seniority: null, ats: null, maxExp: null, remote: null, company: null, us: null })} />
-            ) : (
-              <ul className={cn("divide-y divide-line transition-opacity", feed.loading && "opacity-50")}>
-                {rows.map((j) => (
-                  <JobRow
-                    key={j.id}
-                    job={j}
-                    now={feed.now}
-                    selected={j.id === selectedId}
-                    status={tracker.items[j.id]?.status}
-                    onSelect={select}
-                    onToggleSave={toggleSave}
-                    onHide={hide}
-                  />
-                ))}
-              </ul>
-            )}
-
-            <div ref={sentinel} />
-            {feed.loadingMore && (
-              <div className="flex items-center justify-center gap-2 border-t border-line py-4 text-sm text-muted">
-                <Loader2 size={15} className="animate-spin" /> Loading more…
-              </div>
-            )}
-            {!feed.loading && !feed.hasMore && feed.jobs.length > 0 && (
-              <div className="border-t border-line py-4 text-center text-xs text-subtle">That&apos;s everything matching your filters.</div>
-            )}
-          </div>
-        </section>
-
-        {/* ── Preview (desktop) ── */}
-        <aside
-          aria-label="Job details"
-          className="hidden min-w-0 lg:block"
-        >
-          <div
-            className="sticky overflow-y-auto rounded-2xl border border-line bg-surface shadow-sm"
-            style={{ top: 56 + barH + 16, maxHeight: `calc(100dvh - ${56 + barH + 32}px)` }}
-          >
-            {selectedId ? (
-              <JobDetail key={selectedId} jobId={selectedId} preview={selectedPreview} status={tracker.items[selectedId]?.status} {...detailProps} />
-            ) : feed.loading ? (
-              <div className="h-96" />
-            ) : (
-              <div className="grid h-96 place-items-center text-sm text-muted">Select a job to see the details</div>
-            )}
+      <div className="mx-auto grid w-full max-w-[1320px] grid-cols-[minmax(0,1fr)] gap-10 px-4 py-8 sm:px-6 lg:grid-cols-[220px_minmax(0,1fr)]">
+        <aside aria-label="Filters" className="hidden lg:block">
+          <div className="no-scrollbar sticky top-24 max-h-[calc(100dvh-7rem)] overflow-y-auto pb-6">
+            <FilterRail companyName={companyName} />
           </div>
         </aside>
+
+        <section aria-label="Job results" className="min-w-0">
+          <div className="mb-5 flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
+            <div className="min-w-0">
+              <h2 className="truncate font-display text-[28px] font-semibold leading-tight tracking-tight sm:text-[32px]">{heading}</h2>
+              <p className="mt-1 flex items-center gap-1.5 text-sm text-muted">
+                <span className="live-dot h-1.5 w-1.5 rounded-full bg-accent" />
+                {feed.total === null ? "Loading…" : `${feed.total.toLocaleString()} open ${feed.total === 1 ? "role" : "roles"}`}
+                {feed.lastRun && <span className="text-subtle">· boards checked {ago(feed.lastRun, feed.now, true)}</span>}
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="flex h-10 items-center gap-2 rounded-full border border-line bg-surface pl-4 pr-2 text-sm shadow-sm">
+                <span className="text-subtle">Sort</span>
+                <select
+                  value={get("sort") === "salary" ? "salary" : "new"}
+                  onChange={(e) => update({ sort: e.target.value === "salary" ? "salary" : null, job: null })}
+                  className="cursor-pointer bg-transparent pr-1 font-medium outline-none"
+                >
+                  <option value="new">Newest first</option>
+                  <option value="salary">Highest salary</option>
+                </select>
+              </label>
+              <div role="radiogroup" aria-label="Layout" className="flex h-10 items-center rounded-full border border-line bg-surface p-1 shadow-sm">
+                {([
+                  ["cards", LayoutGrid, "Cards"],
+                  ["list", Rows3, "List"],
+                ] as const).map(([v, Icon, label]) => (
+                  <button
+                    key={v}
+                    type="button"
+                    role="radio"
+                    aria-checked={view === v}
+                    aria-label={`${label} view`}
+                    title={`${label} view`}
+                    onClick={() => setView(v)}
+                    className={cn("grid h-8 w-9 place-items-center rounded-full transition-colors", view === v ? "bg-primary text-primary-fg" : "text-subtle hover:text-fg")}
+                  >
+                    <Icon size={16} />
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {feed.pendingCount > 0 && (
+            <button
+              type="button"
+              onClick={() => {
+                feed.showPending();
+                document.querySelector('[aria-label="Job results"]')?.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="fade-up mb-4 flex w-full items-center justify-center gap-2 rounded-full bg-ink py-3 text-sm font-semibold text-ink-fg hover:bg-ink-3"
+            >
+              <ArrowUp size={15} className="text-lime" />
+              {feed.pendingCount >= 30 ? "30+" : feed.pendingCount} new {feed.pendingCount === 1 ? "job" : "jobs"} just found. Show {feed.pendingCount === 1 ? "it" : "them"}
+            </button>
+          )}
+
+          {view === "list" && wide ? (
+            <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] gap-5">
+              <div className="min-w-0">{results}</div>
+              <aside aria-label="Job details" className="min-w-0">
+                <div className="sticky top-24 max-h-[calc(100dvh-7rem)] overflow-y-auto rounded-3xl border border-line bg-surface shadow-sm">
+                  {selectedId ? (
+                    <JobDetail key={selectedId} jobId={selectedId} preview={selectedPreview} status={tracker.items[selectedId]?.status} {...detailProps} />
+                  ) : (
+                    <div className="grid h-96 place-items-center text-sm text-muted">{feed.loading ? "" : "Select a job to see the details"}</div>
+                  )}
+                </div>
+              </aside>
+            </div>
+          ) : (
+            results
+          )}
+
+          <div ref={sentinel} />
+          {feed.loadingMore && (
+            <div className="flex items-center justify-center gap-2 py-6 text-sm text-muted">
+              <Loader2 size={15} className="animate-spin" /> Loading more…
+            </div>
+          )}
+          {!feed.loading && !feed.hasMore && feed.jobs.length > 0 && (
+            <p className="py-8 text-center text-sm text-subtle">That&apos;s every open role matching your filters.</p>
+          )}
+        </section>
       </div>
 
-      {/* ── Preview (mobile sheet) ── */}
       {prefs.loaded && (
         <Onboarding
           key={editingPrefs ? "edit" : "first"}
@@ -385,25 +426,47 @@ export default function Feed({ signedIn }: { signedIn: boolean }) {
         />
       )}
 
+      {/* Details drawer: Cards view, or List view on smaller screens */}
       <Dialog.Root open={!isDesktop && !!urlJob} onOpenChange={(o) => !o && closeSheet()}>
         <Dialog.Portal>
-          <Dialog.Overlay className="overlay-in fixed inset-0 z-40 bg-black/40" />
+          <Dialog.Overlay className="overlay-in fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px]" />
           <Dialog.Content
             aria-describedby={undefined}
-            className="sheet-in fixed inset-x-0 bottom-0 top-0 z-50 overflow-y-auto bg-surface outline-none sm:top-6 sm:rounded-t-2xl"
+            className="panel-in fixed inset-0 z-50 overflow-y-auto bg-surface shadow-lg outline-none sm:inset-y-3 sm:left-auto sm:right-3 sm:w-[620px] sm:rounded-3xl"
           >
             <Dialog.Title className="sr-only">Job details</Dialog.Title>
             {urlJob && <JobDetail key={urlJob} jobId={urlJob} preview={feed.jobs.find((j) => j.id === urlJob)} status={tracker.items[urlJob]?.status} onClose={closeSheet} {...detailProps} />}
           </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
-    </div>
+
+      {/* Filters sheet on phones and tablets */}
+      <Dialog.Root open={filtersOpen} onOpenChange={setFiltersOpen}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="overlay-in fixed inset-0 z-40 bg-black/40" />
+          <Dialog.Content aria-describedby={undefined} className="sheet-in fixed inset-x-0 bottom-0 z-50 flex max-h-[88dvh] flex-col rounded-t-3xl bg-surface outline-none">
+            <div className="flex justify-center px-5 pb-3 pt-3">
+              <Dialog.Title className="sr-only">Filters</Dialog.Title>
+              <span aria-hidden className="h-1 w-10 rounded-full bg-line-strong" />
+            </div>
+            <div className="flex-1 overflow-y-auto px-5 pb-4">
+              <FilterRail companyName={companyName} />
+            </div>
+            <div className="border-t border-line p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+              <Button variant="primary" size="lg" className="w-full" onClick={() => setFiltersOpen(false)}>
+                Show {feed.total === null ? "" : feed.total.toLocaleString()} {feed.total === 1 ? "job" : "jobs"}
+              </Button>
+            </div>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
+    </>
   );
 }
 
 function EmptyState({ onReset }: { onReset: () => void }) {
   return (
-    <div className="flex flex-col items-center px-6 py-16 text-center">
+    <div className="flex flex-col items-center rounded-3xl border border-dashed border-line-strong px-6 py-16 text-center">
       <div className="mb-4 grid h-12 w-12 place-items-center rounded-2xl bg-surface-2 text-subtle">
         <SearchX size={22} />
       </div>

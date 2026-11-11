@@ -58,7 +58,8 @@ function extractMinExp(text: string): number | null {
     text.match(/experience[^.]{0,40}?(\d{1,2})\s*\+?\s*years?/i);
   if (!m) return null;
   const n = parseInt(m[1], 10);
-  return n >= 0 && n <= 25 ? n : null;
+  // Above ~15 it is almost always company history ("25+ years serving restaurants"), not a requirement.
+  return n >= 0 && n <= 15 ? n : null;
 }
 
 const CATEGORIES: [string, RegExp][] = [

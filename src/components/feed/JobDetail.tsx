@@ -215,7 +215,7 @@ export function JobDetail({
             <a href={`/companies/${job.company_slug}`} className="text-sm font-medium text-muted hover:text-accent hover:underline" title={`About ${job.company_name}`}>
               {job.company_name}
             </a>
-            <h2 className="mt-0.5 text-xl font-semibold leading-tight tracking-tight text-fg sm:text-[22px]">{job.title}</h2>
+            <h2 className="mt-0.5 font-display text-[22px] font-semibold leading-tight tracking-tight text-fg sm:text-[26px]">{job.title}</h2>
             <p className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-muted">
               <span className="inline-flex items-center gap-1"><MapPin size={13} />{loc.first}{loc.extra > 0 && ` +${loc.extra} more`}</span>
               <span className="text-subtle">·</span>

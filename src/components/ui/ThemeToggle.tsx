@@ -25,7 +25,7 @@ function set(t: Theme) {
   listeners.forEach((l) => l());
 }
 
-export function ThemeToggle({ className }: { className?: string }) {
+export function ThemeToggle({ className, tone = "default" }: { className?: string; tone?: "ink" | "default" }) {
   const theme = useSyncExternalStore(
     (cb) => (listeners.add(cb), () => listeners.delete(cb)),
     read,
@@ -37,7 +37,7 @@ export function ThemeToggle({ className }: { className?: string }) {
     ["dark", Moon, "Dark"],
   ];
   return (
-    <div role="radiogroup" aria-label="Theme" className={cn("inline-flex rounded-lg border border-line bg-surface p-0.5", className)}>
+    <div role="radiogroup" aria-label="Theme" className={cn("inline-flex rounded-full border p-0.5", tone === "ink" ? "border-ink-line bg-ink-2" : "border-line bg-surface", className)}>
       {opts.map(([t, Icon, label]) => (
         <button
           key={t}
@@ -46,7 +46,10 @@ export function ThemeToggle({ className }: { className?: string }) {
           aria-label={label}
           title={label}
           onClick={() => set(t)}
-          className={cn("grid h-7 w-7 place-items-center rounded-md transition-colors", theme === t ? "bg-surface-3 text-fg" : "text-subtle hover:text-fg")}
+          className={cn(
+            "grid h-7 w-7 place-items-center rounded-full transition-colors",
+            tone === "ink" ? (theme === t ? "bg-ink-3 text-ink-fg" : "text-ink-muted hover:text-ink-fg") : theme === t ? "bg-surface-3 text-fg" : "text-subtle hover:text-fg",
+          )}
         >
           <Icon size={14} />
         </button>

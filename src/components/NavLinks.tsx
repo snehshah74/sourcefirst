@@ -22,7 +22,7 @@ export function NavLinks({ className }: { className?: string }) {
             key={href}
             href={href}
             aria-current={active ? "page" : undefined}
-            className={cn("rounded-lg px-3 py-1.5 text-sm font-medium transition-colors", active ? "bg-surface-2 text-fg" : "text-muted hover:text-fg")}
+            className={cn("rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors", active ? "bg-ink-3 text-ink-fg" : "text-ink-muted hover:text-ink-fg")}
           >
             {label}
           </Link>
