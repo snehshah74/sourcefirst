@@ -76,7 +76,7 @@ export function SearchDeck({
   const fieldCls = "h-14 w-full bg-transparent text-[16px] text-ink-fg outline-none placeholder:text-ink-muted";
 
   return (
-    <section className="bg-ink text-ink-fg">
+    <section className="border-b border-ink-line bg-ink text-ink-fg">
       <div className="mx-auto max-w-[1320px] px-4 pb-8 pt-6 sm:px-6 sm:pb-10 sm:pt-12">
         {hero}
         <form
@@ -110,7 +110,7 @@ export function SearchDeck({
                 </button>
               )}
             </label>
-            <button type="submit" className="m-1 hidden h-12 rounded-xl bg-ink-fg px-6 text-[15px] font-medium text-ink shadow-[inset_0_1px_0_rgba(255,255,255,0.4)] transition-colors hover:bg-white md:ml-2 md:block">
+            <button type="submit" className="m-1 hidden h-12 rounded-xl bg-ink-fg px-6 text-[15px] font-medium text-ink shadow-[inset_0_1px_0_rgba(255,255,255,0.4)] transition-colors hover:opacity-90 md:ml-2 md:block">
               Search
             </button>
           </div>

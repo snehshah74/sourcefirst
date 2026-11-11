@@ -44,10 +44,10 @@ export const JobCard = memo(function JobCard({
   return (
     <li className="group fade-up">
       <article
-        className="flex h-full cursor-pointer flex-col rounded-[24px] border border-line bg-surface p-1.5 shadow-sm transition-colors duration-150 hover:border-line-strong"
+        className="flex h-full cursor-pointer flex-col rounded-2xl border border-line bg-surface p-1 transition-colors duration-150 hover:border-line-strong"
         onClick={() => onOpen(job.id)}
       >
-        <div className="flex flex-1 flex-col rounded-[19px] p-4 pb-5" style={{ background: tintFor(job.company_slug) }}>
+        <div className="flex flex-1 flex-col rounded-xl p-4 pb-5" style={{ background: tintFor(job.company_slug) }}>
           <div className="flex items-center justify-between gap-2">
             <span className="inline-flex h-7 items-center gap-2 rounded-full bg-surface px-3 font-mono text-xs tabular-nums text-fg/80" title={`Found ${new Date(job.first_seen_at).toLocaleString()}`}>
               <span className={cn("h-2 w-2 rounded-full ring-1 ring-fg/20", fresh ? "bg-lime" : "bg-fg/15")} />
@@ -126,8 +126,8 @@ export const JobCard = memo(function JobCard({
 
 export function JobCardSkeleton() {
   return (
-    <li className="rounded-[24px] border border-line bg-surface p-1.5">
-      <div className="space-y-4 rounded-[19px] bg-surface-2 p-4">
+    <li className="rounded-2xl border border-line bg-surface p-1">
+      <div className="space-y-4 rounded-xl bg-surface-2 p-4">
         <div className="skeleton h-7 w-28 !rounded-full" />
         <div className="space-y-2 pt-3">
           <div className="skeleton h-3.5 w-24" />

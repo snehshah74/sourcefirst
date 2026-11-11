@@ -20,7 +20,7 @@ export default async function SiteHeader() {
             ) : (
               <>
                 <Link href="/sign-in" className="hidden h-9 items-center whitespace-nowrap px-3 text-sm font-medium text-ink-muted transition-colors hover:text-ink-fg sm:inline-flex">Sign in</Link>
-                <Link href="/sign-up" className="inline-flex h-9 items-center whitespace-nowrap rounded-[10px] bg-ink-fg px-4 text-sm font-medium text-ink transition-colors hover:bg-white">
+                <Link href="/sign-up" className="inline-flex h-9 items-center whitespace-nowrap rounded-[10px] bg-ink-fg px-4 text-sm font-medium text-ink transition-colors hover:opacity-90">
                   Sign up<span className="hidden sm:inline">&nbsp;free</span>
                 </Link>
               </>

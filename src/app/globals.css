@@ -88,21 +88,21 @@
   color-scheme: dark;
 }
 
-/* Ink: the dark search band and header (dark in both themes). Lime is only ever used on ink. */
+/* Header, hero and search surfaces. They follow the theme so the page reads as one piece. */
 :root {
-  --ink: #0e0f12;
-  --ink-2: #17191d;
-  --ink-3: #22252b;
-  --ink-line: #2b2e35;
-  --ink-fg: #f4f5f7;
-  --ink-muted: #9ba1ab;
+  --ink: #fafaf9;
+  --ink-2: #ffffff;
+  --ink-3: #f0f0ee;
+  --ink-line: #e7e7e3;
+  --ink-fg: #111214;
+  --ink-muted: #5d626b;
   --lime: #c8f560;
   --lime-hover: #d8fb86;
   --lime-fg: #0e0f12;
-  /* Primary actions: ink on light, off-white on dark. Lime stays for the brand mark and live moments */
-  --primary: var(--ink);
-  --primary-hover: var(--ink-3);
-  --primary-fg: var(--ink-fg);
+  /* Primary actions: near-black on light, off-white on dark. Lime is only for the mark and live signals */
+  --primary: #111214;
+  --primary-hover: #2a2c31;
+  --primary-fg: #ffffff;
   /* Soft per-company card tints (picked by hashing the company), light theme */
   --tint-1: #e3f0fa;
   --tint-2: #fbe7ee;
@@ -114,6 +114,8 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --ink: #08090b;
+    --ink-fg: #f4f5f7;
+    --ink-muted: #9ba1ab;
     --primary: var(--fg);
     --primary-hover: #ffffff;
     --primary-fg: var(--bg);
@@ -130,6 +132,8 @@
 }
 :root[data-theme="dark"] {
   --ink: #08090b;
+  --ink-fg: #f4f5f7;
+  --ink-muted: #9ba1ab;
   --primary: var(--fg);
   --primary-hover: #ffffff;
   --primary-fg: var(--bg);
@@ -180,7 +184,7 @@
   --color-lime: var(--lime);
   --color-lime-hover: var(--lime-hover);
   --color-lime-fg: var(--lime-fg);
-  --font-display: var(--font-display-face), var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }

@@ -38,7 +38,7 @@ export default async function Home() {
           <span className="tabular-nums">{s.companies.toLocaleString()}</span> career pages
         </h1>
         <p className="mt-4 max-w-xl text-[17px] leading-relaxed text-ink-muted sm:mt-5 sm:text-lg">
-          Roles show up here minutes after a company posts them, often hours before LinkedIn or Indeed. Be the first applicant, not the 500th.
+          Roles show up here minutes after a company posts them, often hours before LinkedIn or Indeed. Be the 1st applicant, not the 500th.
         </p>
       </div>
 
@@ -47,7 +47,7 @@ export default async function Home() {
           <div className="flex items-center justify-between px-3 pb-2 pt-2">
             <h2 className="text-sm font-medium">Just found</h2>
             <p className="flex items-center gap-2 font-mono text-xs text-ink-muted">
-              <span className="live-dot h-1.5 w-1.5 rounded-full bg-lime" />
+              <span className="live-dot h-1.5 w-1.5 rounded-full bg-accent" />
               {s.lastRun ? `checked ${ago(s.lastRun, now)} ago`.replace("just now ago", "just now") : "live"}
             </p>
           </div>
@@ -55,7 +55,7 @@ export default async function Home() {
             {latest.map((j) => (
               <li key={j.id}>
                 <Link href={`/?job=${encodeURIComponent(j.id)}`} className="grid grid-cols-[56px_28px_minmax(0,1fr)] items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-ink-3">
-                  <span className="whitespace-nowrap font-mono text-xs tabular-nums text-lime">{ago(j.first_seen_at, now)}</span>
+                  <span className="whitespace-nowrap font-mono text-xs tabular-nums text-accent">{ago(j.first_seen_at, now)}</span>
                   <CompanyLogo name={j.company_name} domain={j.company_domain} size={28} className="!rounded-lg !border-0" />
                   <span className="min-w-0">
                     <span className="block truncate text-sm text-ink-fg">{cleanTitle(j.title)}</span>
@@ -82,7 +82,7 @@ export default async function Home() {
               <div className="flex flex-col">
                 <h2 className="max-w-sm font-display text-[32px] font-medium leading-tight tracking-tight sm:text-[40px]">How you get there first</h2>
                 <div className="mt-8 flex flex-col items-start gap-6 lg:mt-auto">
-                  <Link href="/sign-up" className="inline-flex h-12 items-center rounded-xl bg-ink-fg px-6 font-medium text-ink shadow-[inset_0_1px_0_rgba(255,255,255,0.4)] transition-colors hover:bg-white">
+                  <Link href="/sign-up" className="inline-flex h-12 items-center rounded-xl bg-ink-fg px-6 font-medium text-ink shadow-[inset_0_1px_0_rgba(255,255,255,0.4)] transition-colors hover:opacity-90">
                     Create a free account
                   </Link>
                   <div className="flex items-center gap-3">

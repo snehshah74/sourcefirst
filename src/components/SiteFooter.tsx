@@ -54,8 +54,6 @@ export default function SiteFooter() {
       <div className="border-t border-line">
         <div className="mx-auto flex max-w-[1320px] flex-wrap items-center gap-x-4 gap-y-1 px-4 py-4 text-xs text-subtle sm:px-6">
           <span>© {new Date().getFullYear()} SourceFirst</span>
-          <Link href="/status" className="hover:text-fg">Pipeline status</Link>
-          <span className="w-full sm:ml-auto sm:w-auto">Data from public company career pages. Always apply on the employer&apos;s site.</span>
         </div>
       </div>
     </footer>

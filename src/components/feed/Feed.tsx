@@ -375,9 +375,9 @@ export default function Feed({ signedIn, hero }: { signedIn: boolean; hero?: Rea
                 feed.showPending();
                 document.querySelector('[aria-label="Job results"]')?.scrollIntoView({ behavior: "smooth" });
               }}
-              className="fade-up mb-4 flex w-full items-center justify-center gap-2 rounded-xl bg-ink py-3 text-sm font-medium text-ink-fg transition-colors hover:bg-ink-3"
+              className="fade-up mb-4 flex w-full items-center justify-center gap-2 rounded-xl bg-ink py-3 text-sm font-medium text-ink-fg ring-1 ring-ink-line transition-colors hover:bg-ink-3"
             >
-              <ArrowUp size={15} className="text-lime" />
+              <ArrowUp size={15} className="text-accent" />
               {feed.pendingCount >= 30 ? "30+" : feed.pendingCount} new {feed.pendingCount === 1 ? "job" : "jobs"} just found. Show {feed.pendingCount === 1 ? "it" : "them"}
             </button>
           )}
@@ -406,14 +406,14 @@ export default function Feed({ signedIn, hero }: { signedIn: boolean; hero?: Rea
             </div>
           )}
           {!signedIn && !feed.loading && feed.total !== null && feed.total > feed.jobs.length && (
-            <div className="mt-4 flex flex-col items-start justify-between gap-5 rounded-3xl bg-ink p-6 text-ink-fg sm:flex-row sm:items-center sm:p-8">
+            <div className="mt-4 flex flex-col items-start justify-between gap-5 rounded-3xl bg-ink p-6 text-ink-fg ring-1 ring-ink-line sm:flex-row sm:items-center sm:p-8">
               <div>
                 <h3 className="font-display text-[24px] font-medium tracking-tight">{(feed.total - feed.jobs.length).toLocaleString()} more roles match this search</h3>
                 <p className="mt-1 text-[15px] text-ink-muted">Sign up free to see all of them, save jobs and get alerts</p>
               </div>
               <div className="flex shrink-0 items-center gap-2">
                 <Link href={`/sign-in?next=${encodeURIComponent(`/?${feed.query}`)}`} className="inline-flex h-11 items-center rounded-xl px-4 text-sm font-medium text-ink-muted transition-colors hover:text-ink-fg">Sign in</Link>
-                <Link href={`/sign-up?next=${encodeURIComponent(`/?${feed.query}`)}`} className="inline-flex h-11 items-center rounded-xl bg-ink-fg px-5 text-sm font-medium text-ink transition-colors hover:bg-white">Sign up free</Link>
+                <Link href={`/sign-up?next=${encodeURIComponent(`/?${feed.query}`)}`} className="inline-flex h-11 items-center rounded-xl bg-ink-fg px-5 text-sm font-medium text-ink transition-colors hover:opacity-90">Sign up free</Link>
               </div>
             </div>
           )}

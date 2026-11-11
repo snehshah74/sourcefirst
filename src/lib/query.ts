@@ -133,15 +133,18 @@ export async function topCompanies(limit = 40) {
     .limit(limit);
 }
 
-/** The most recently found open roles, for the live log on the home page. */
+/** The most recently found open roles for the live log on the home page, one per company so a bulk post can't fill it. */
 export async function latestJobs(limit = 5) {
   const db = await getDb();
-  return db
+  const rows = await db
     .select({ id: jobs.id, title: jobs.title, company_name: jobs.company_name, company_domain: jobs.company_domain, first_seen_at: jobs.first_seen_at })
     .from(jobs)
     .where(isNull(jobs.closed_at))
     .orderBy(desc(jobs.first_seen_at), desc(jobs.id))
-    .limit(limit);
+    .limit(200);
+  const newest = new Map<string, (typeof rows)[number]>();
+  for (const r of rows) if (!newest.has(r.company_name)) newest.set(r.company_name, r);
+  return [...newest.values()].slice(0, limit);
 }
 
 /** Every company with open roles, biggest first (for the /companies directory). */
