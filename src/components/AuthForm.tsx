@@ -30,10 +30,10 @@ export default function AuthForm({ mode, googleEnabled = false }: { mode: Mode; 
   // Set once we've emailed a 6-digit code to this address and are waiting for it.
   const [codeFor, setCodeFor] = useState<string | null>(null);
   const [resent, setResent] = useState(false);
+  const [otp, setOtp] = useState("");
 
   async function onVerify(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const otp = String(new FormData(e.currentTarget).get("otp") ?? "").trim();
     setBusy(true);
     setError(null);
     const { error } = await authClient.emailOtp.verifyEmail({ email: codeFor!, otp });
@@ -153,12 +153,15 @@ export default function AuthForm({ mode, googleEnabled = false }: { mode: Mode; 
             <form onSubmit={onVerify} className="mt-7 space-y-3">
               <label className="block">
                 <span className="mb-1.5 block text-[13px] font-medium">Code</span>
+                {/* Digits only: browsers sometimes autofill a name here, and pasted codes often carry spaces */}
                 <input
-                  name="otp"
+                  name="one-time-code"
+                  type="text"
                   inputMode="numeric"
                   autoComplete="one-time-code"
-                  pattern="[0-9]{6}"
-                  maxLength={6}
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                  minLength={6}
                   required
                   autoFocus
                   className={cn(input, "font-mono text-lg tracking-[0.4em]")}
@@ -174,6 +177,21 @@ export default function AuthForm({ mode, googleEnabled = false }: { mode: Mode; 
                 Didn&apos;t get it? Check spam, or{" "}
                 <button type="button" onClick={resend} disabled={resent} className="font-medium text-fg underline underline-offset-2 disabled:no-underline disabled:opacity-70">
                   {resent ? "new code sent" : "send a new code"}
+                </button>
+              </p>
+              <p className="text-sm text-muted">
+                Wrong email?{" "}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCodeFor(null);
+                    setOtp("");
+                    setResent(false);
+                    setError(null);
+                  }}
+                  className="font-medium text-fg underline underline-offset-2"
+                >
+                  Start over
                 </button>
               </p>
             </form>
