@@ -4,10 +4,13 @@ import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import { CompanyLogo } from "@/components/ui/CompanyLogo";
 import { currentUser } from "@/lib/auth";
-import { latestJobs, stats, topCompanies } from "@/lib/query";
+import { featuredCompanies, latestJobs, stats } from "@/lib/query";
 import { CountUp, JustFound, NextCheck } from "@/components/LiveHero";
 
 export const dynamic = "force-dynamic";
+
+/** Names people recognise, shown as the logo row (only the ones whose boards are live). */
+const FEATURED = ["anthropic", "openai", "stripe", "figma", "notion", "nvidia", "airbnb", "databricks"];
 
 const STEPS = [
   ["We read the career pages", "Every 15 minutes we check the job boards of each company directly: Workday, Greenhouse, Lever, Ashby and five more."],
@@ -16,7 +19,7 @@ const STEPS = [
 ];
 
 export default async function Home() {
-  const [s, companies, latest, user] = await Promise.all([stats(), topCompanies(12), latestJobs(5), currentUser()]);
+  const [s, companies, latest, user] = await Promise.all([stats(), featuredCompanies(FEATURED), latestJobs(5), currentUser()]);
 
   const hero = user ? (
     <div className="mb-8">
@@ -68,14 +71,14 @@ export default async function Home() {
                   </Link>
                   <div className="flex items-center gap-3">
                     <div className="flex -space-x-2">
-                      {companies.filter((c) => c.domain).slice(0, 6).map((c) => (
+                      {companies.map((c) => (
                         <Link key={`${c.ats}/${c.slug}`} href={`/companies/${c.slug}`} title={c.name} className="rounded-full ring-2 ring-ink">
-                          <CompanyLogo name={c.name} domain={c.domain} size={32} className="!rounded-full !border-0" />
+                          <CompanyLogo name={c.name} domain={c.domain} size={36} className="!rounded-full !border-0 !p-1.5" />
                         </Link>
                       ))}
                     </div>
                     <Link href="/companies" className="text-sm text-ink-muted transition-colors hover:text-ink-fg">
-                      and {Math.max(0, s.companies - 6).toLocaleString()} more companies
+                      and {Math.max(0, s.companies - companies.length).toLocaleString()} more companies
                     </Link>
                   </div>
                 </div>

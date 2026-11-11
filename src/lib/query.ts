@@ -123,15 +123,6 @@ export async function stats() {
   return { openJobs: Number(a.n), jobsToday: Number(b.n), jobsLastHour: Number(c.n), companies: Number(d.n), lastRun: e.t ?? null };
 }
 
-export async function topCompanies(limit = 40) {
-  const db = await getDb();
-  return db
-    .select({ slug: companies.slug, name: companies.name, domain: companies.domain, ats: companies.ats, open_jobs: companies.open_jobs })
-    .from(companies)
-    .where(isNotNull(companies.last_ok_at))
-    .orderBy(desc(companies.open_jobs))
-    .limit(limit);
-}
 
 /** The most recently found open roles for the live log on the home page, one per company so a bulk post can't fill it. */
 export async function latestJobs(limit = 5) {
@@ -145,6 +136,16 @@ export async function latestJobs(limit = 5) {
   const newest = new Map<string, (typeof rows)[number]>();
   for (const r of rows) if (!newest.has(r.company_name)) newest.set(r.company_name, r);
   return [...newest.values()].slice(0, limit);
+}
+
+/** Well-known companies we track, in the given order, for the logo row on the home page. */
+export async function featuredCompanies(slugs: string[]) {
+  const db = await getDb();
+  const rows = await db
+    .select({ slug: companies.slug, name: companies.name, domain: companies.domain, ats: companies.ats })
+    .from(companies)
+    .where(and(inArray(companies.slug, slugs), isNotNull(companies.last_ok_at)));
+  return slugs.map((s) => rows.find((r) => r.slug === s)).filter((r) => r !== undefined);
 }
 
 /** Every company with open roles, biggest first (for the /companies directory). */

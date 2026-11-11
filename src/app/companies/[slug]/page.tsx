@@ -8,7 +8,7 @@ import FollowCompany from "@/components/FollowCompany";
 import { CompanyLogo } from "@/components/ui/CompanyLogo";
 import { Badge } from "@/components/ui/Badge";
 import { buttonClass } from "@/components/ui/Button";
-import { ATS_LABEL, formatSalary, splitLocations } from "@/components/feed/format";
+import { ATS_LABEL, cleanTitle, formatSalary, splitLocations } from "@/components/feed/format";
 import { currentUser } from "@/lib/auth";
 import { PROVIDERS } from "@/lib/ats";
 import type { Company } from "@/lib/companies";
@@ -17,6 +17,9 @@ import { companyWithJobs } from "@/lib/query";
 import type { JobRow } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
+
+/** Newest roles shown per area; big employers have thousands, so the rest are a click away in the feed. */
+const PER_TEAM = 12;
 
 export async function generateMetadata({ params }: PageProps<"/companies/[slug]">): Promise<Metadata> {
   const data = await companyWithJobs((await params).slug);
@@ -117,14 +120,14 @@ export default async function CompanyPage({ params }: PageProps<"/companies/[slu
                 {team} <span className="font-normal text-subtle">{js.length}</span>
               </h2>
               <ul className="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-surface shadow-sm">
-                {js.map((j) => {
+                {js.slice(0, PER_TEAM).map((j) => {
                   const salary = formatSalary(j.salary);
                   const loc = splitLocations(j.location);
                   return (
                     <li key={j.id}>
                       <Link href={`/?company=${company.slug}&us=0&job=${encodeURIComponent(j.id)}`} className="flex items-center gap-3 px-4 py-3 hover:bg-surface-2/70">
                         <span className="min-w-0 flex-1">
-                          <span className="block truncate text-[15px] font-medium">{j.title}</span>
+                          <span className="block truncate text-[15px] font-medium">{cleanTitle(j.title)}</span>
                           <span className="mt-0.5 flex flex-wrap items-center gap-1.5 text-[13px] text-muted">
                             {loc.first}{loc.extra > 0 && ` +${loc.extra}`}
                             {j.department && <span className="hidden text-subtle sm:inline">· {j.department.replace(/^\d+\s+/, "")}</span>}
@@ -139,6 +142,11 @@ export default async function CompanyPage({ params }: PageProps<"/companies/[slu
                   );
                 })}
               </ul>
+              {js.length > PER_TEAM && (
+                <Link href={`/?company=${company.slug}&us=0&category=${encodeURIComponent(team)}`} className="mt-2 inline-flex px-1 text-sm font-medium text-muted transition-colors hover:text-fg">
+                  See all {js.length.toLocaleString()} {team} roles →
+                </Link>
+              )}
             </section>
           ))}
           {!jobs.length && <p className="rounded-2xl border border-dashed border-line p-10 text-center text-sm text-muted">No open roles right now. Follow to hear the moment one opens.</p>}
