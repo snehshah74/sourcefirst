@@ -1,8 +1,8 @@
 import type { EnrichedJob, RawJob, Visa } from "./types";
 
 /**
- * Rule-based enrichment. EarlyApply uses Gemini for this; regex rules catch the
- * explicit cases cheaply and default to "Maybe" when a posting says nothing.
+ * Rule-based enrichment. Regex rules catch the explicit cases cheaply and
+ * default to "Maybe" when a posting says nothing.
  * To add an LLM pass, call it only for jobs that come back "Maybe" here.
  */
 

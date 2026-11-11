@@ -1,4 +1,4 @@
-/** Programmatic SEO landing pages: EarlyApply's main growth channel. Add rows to add pages. */
+/** Programmatic SEO landing pages, one per common search. Add rows to add pages. */
 export interface Landing {
   slug: string;
   h1: string;

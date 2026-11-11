@@ -1,6 +1,6 @@
 # SourceFirst
 
-A job board that reads company ATS boards (Greenhouse, Lever, Ashby) directly every 15 minutes, so jobs show up here before they reach LinkedIn or Indeed. Users can create accounts, save jobs, track applications, and get email alerts for saved searches. It's modeled on earlyapply.io; see `../RESEARCH.md` for the teardown.
+A job board that reads company ATS boards (Greenhouse, Lever, Ashby) directly every 15 minutes, so jobs show up here before they reach LinkedIn or Indeed. Users can create accounts, save jobs, track applications, and get email alerts for saved searches.
 
 ## Run it locally (no setup needed)
 ```bash

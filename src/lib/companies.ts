@@ -5,7 +5,7 @@ import discovered from "./companies.discovered.json";
  * Starter list of companies and their public ATS board tokens.
  * The token is the path segment in the company's job board URL, e.g.
  *   boards.greenhouse.io/<token>   jobs.lever.co/<token>   jobs.ashbyhq.com/<token>
- * Scaling this list (EarlyApply claims 10k+) is the main lever for coverage.
+ * Growing this list is the main lever for coverage.
  * Add more with `npm run discover -- <ats> <token> [domain]` or by editing this file.
  */
 export interface Company {

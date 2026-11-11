@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// Logo proxy keyed by company domain (same idea as EarlyApply's /api/logo?domain=).
+// Company logo proxy, keyed by domain (/api/logo?domain=example.com). Cached for a week.
 export async function GET(req: NextRequest) {
   const domain = req.nextUrl.searchParams.get("domain") ?? "";
   if (!/^[a-z0-9.-]+\.[a-z]{2,}$/i.test(domain)) return new NextResponse(null, { status: 400 });
