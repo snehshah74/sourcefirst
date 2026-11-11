@@ -5,7 +5,7 @@
 #   DATABASE_URL    Supabase "Session pooler" connection string (required)
 #   SITE_URL        https://your-app.vercel.app (used for links in alert emails)
 #   SMTP_USER       your Gmail address              ┐ optional: without these, alerts are only logged
-#   SMTP_PASS       a Gmail App Password            ┘
+#   SMTP_PASS       a Gmail App Password            ┘ (or RESEND_API_KEY + EMAIL_FROM for Resend)
 #   HEALTHCHECK_URL https://hc-ping.com/…           optional: emails you if crawls stop
 #
 # Timing: GitHub's own schedule is unreliable (it often skips runs for hours), so each run queues
@@ -73,6 +73,7 @@ jobs:
           SMTP_USER: ${{ secrets.SMTP_USER }}
           SMTP_PASS: ${{ secrets.SMTP_PASS }}
           EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           HEALTHCHECK_URL: ${{ secrets.HEALTHCHECK_URL }}
 
       # Even when a crawl fails, keep the 15-minute rhythm going.

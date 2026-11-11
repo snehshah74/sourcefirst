@@ -329,8 +329,13 @@ export default function Feed({ signedIn, hero }: { signedIn: boolean; hero?: Rea
           <div className="mb-5 flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
             <div className="min-w-0">
               <h2 className="truncate font-display text-[28px] font-medium leading-tight tracking-tight sm:text-[32px]">{heading}</h2>
-              <p className="mt-1 flex items-center gap-1.5 text-sm text-muted">
-                {feed.total === null ? "Loading…" : `${feed.total.toLocaleString()} open ${feed.total === 1 ? "role" : "roles"}`}
+              <p className="mt-1 flex flex-wrap items-center gap-x-1.5 text-sm text-muted">
+                {feed.total === null ? "Loading…" : `${feed.total.toLocaleString()} open ${feed.total === 1 ? "role" : "roles"}${get("us") !== "0" ? " in the US" : ""}`}
+                {get("us") !== "0" && (
+                  <button type="button" onClick={() => update({ us: "0", job: null })} className="text-fg underline underline-offset-2 hover:no-underline">
+                    show all countries
+                  </button>
+                )}
                 {feed.lastRun && <span className="text-subtle">· boards checked {ago(feed.lastRun, feed.now, true)}</span>}
               </p>
             </div>

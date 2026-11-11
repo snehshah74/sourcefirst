@@ -63,7 +63,7 @@ export function NextCheck({ lastRun: initial }: { lastRun: string | null }) {
   const since = lastRun && now ? now - new Date(lastRun).getTime() : null;
   const left = since === null ? null : EVERY_MS - since;
   const label =
-    left === null ? "" : left <= 0 ? "checking now" : `next check in ${Math.floor(left / 60_000)}:${String(Math.floor((left % 60_000) / 1000)).padStart(2, "0")}`;
+    left === null ? "" : since! > 2 * EVERY_MS ? `last check ${ago(lastRun, now)} ago` : left <= 0 ? "checking now" : `next check in ${Math.floor(left / 60_000)}:${String(Math.floor((left % 60_000) / 1000)).padStart(2, "0")}`;
   return (
     <div className="mt-6 flex max-w-sm flex-col gap-2">
       <p className="flex items-center gap-2 text-sm text-ink-muted">
