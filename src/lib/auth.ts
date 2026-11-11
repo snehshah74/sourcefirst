@@ -46,13 +46,14 @@ function build(db: Awaited<ReturnType<typeof getDb>>) {
     emailVerification: {
       sendOnSignUp: true,
       autoSignInAfterVerification: true,
+      // A failed send must not fail the sign-up itself; the account page offers "Send it again".
       sendVerificationEmail: async ({ user, url }) => {
         await sendEmail({
           to: user.email,
           subject: "Confirm your SourceFirst email",
           text: `Confirm your email to start getting job alerts: ${url}\n\nIf you didn't sign up, ignore this email.`,
           html: `<p>Confirm your email to start getting job alerts:</p><p><a href="${esc(url)}">${esc(url)}</a></p><p>If you didn't sign up, ignore this email.</p>`,
-        });
+        }).catch((e) => console.error(`[email] confirmation to ${user.email} failed:`, (e as Error).message));
       },
     },
     socialProviders: google,
