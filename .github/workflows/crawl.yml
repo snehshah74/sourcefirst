@@ -27,27 +27,38 @@ jobs:
   crawl:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
     steps:
-      - uses: actions/checkout@v4
+      # Until the database secret exists there is nothing to crawl into, so skip cleanly instead of
+      # crawling into a throwaway database and showing a misleading green run.
+      - name: Check configuration
+        if: env.DATABASE_URL == ''
+        run: echo "::notice title=Not configured yet::Add the DATABASE_URL repository secret (Supabase Session pooler URI) to start crawling. See DEPLOY.md."
 
-      - uses: actions/setup-node@v4
+      - if: env.DATABASE_URL != ''
+        uses: actions/checkout@v4
+
+      - if: env.DATABASE_URL != ''
+        uses: actions/setup-node@v4
         with:
           node-version: 22
 
       # Cache node_modules itself (not just the npm cache) so most runs skip installing entirely.
       - id: deps
+        if: env.DATABASE_URL != ''
         uses: actions/cache@v4
         with:
           path: node_modules
           key: deps-${{ runner.os }}-node22-${{ hashFiles('package-lock.json') }}
 
-      - if: steps.deps.outputs.cache-hit != 'true'
+      - if: env.DATABASE_URL != '' && steps.deps.outputs.cache-hit != 'true'
         run: npm ci --no-audit --no-fund
 
       - name: Crawl, send alerts, prune
+        if: env.DATABASE_URL != ''
         run: npx tsx scripts/ingest.ts --direct
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
           SITE_URL: ${{ secrets.SITE_URL }}
           SMTP_USER: ${{ secrets.SMTP_USER }}
           SMTP_PASS: ${{ secrets.SMTP_PASS }}
