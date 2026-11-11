@@ -27,6 +27,28 @@ export default function AuthForm({ mode, googleEnabled = false }: { mode: Mode; 
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  // Set once we've emailed a 6-digit code to this address and are waiting for it.
+  const [codeFor, setCodeFor] = useState<string | null>(null);
+  const [resent, setResent] = useState(false);
+
+  async function onVerify(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const otp = String(new FormData(e.currentTarget).get("otp") ?? "").trim();
+    setBusy(true);
+    setError(null);
+    const { error } = await authClient.emailOtp.verifyEmail({ email: codeFor!, otp });
+    setBusy(false);
+    if (error) return setError(error.message || "That code didn't work. Check it or send a new one.");
+    router.push(next);
+    router.refresh();
+  }
+
+  async function resend() {
+    setError(null);
+    const { error } = await authClient.emailOtp.sendVerificationOtp({ email: codeFor!, type: "email-verification" });
+    if (error) setError(error.message || "Couldn't send a new code. Try again in a minute.");
+    else setResent(true);
+  }
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -39,8 +61,15 @@ export default function AuthForm({ mode, googleEnabled = false }: { mode: Mode; 
       if (mode === "sign-up") {
         const { error } = await authClient.signUp.email({ email, password, name: String(f.get("name") ?? "") });
         if (error) throw new Error(error.message);
+        setCodeFor(email);
+        return;
       } else if (mode === "sign-in") {
         const { error } = await authClient.signIn.email({ email, password });
+        // An account that never confirmed its email gets a fresh code instead of an error.
+        if (error?.status === 403) {
+          setCodeFor(email);
+          return;
+        }
         if (error) throw new Error(error.message);
       } else if (mode === "forgot") {
         const { error } = await authClient.requestPasswordReset({ email, redirectTo: "/reset-password" });
@@ -80,7 +109,7 @@ export default function AuthForm({ mode, googleEnabled = false }: { mode: Mode; 
       <aside className="relative hidden overflow-hidden border-r border-line bg-surface lg:flex lg:flex-col lg:justify-between lg:p-12">
         <Logo />
         <div className="max-w-md">
-          <h2 className="text-[34px] font-semibold leading-[1.1] tracking-tight text-balance">Be one of the first applicants, not the 500th.</h2>
+          <h2 className="text-[34px] font-semibold leading-[1.1] tracking-tight text-balance">Be the 1st applicant, not the 500th.</h2>
           <ul className="mt-8 space-y-4 text-[15px]">
             {[
               [Radar, "Jobs straight from company career pages, checked every 15 minutes"],
@@ -105,8 +134,8 @@ export default function AuthForm({ mode, googleEnabled = false }: { mode: Mode; 
       <div className="flex flex-col px-5 py-8 sm:px-10">
         <div className="lg:hidden"><Logo /></div>
         <div className="mx-auto my-auto w-full max-w-sm py-10">
-          <h1 className="text-2xl font-semibold tracking-tight">{TITLES[mode]}</h1>
-          <p className="mt-1.5 text-sm text-muted">{SUB[mode]}</p>
+          <h1 className="text-2xl font-semibold tracking-tight">{codeFor ? "Check your email" : TITLES[mode]}</h1>
+          <p className="mt-1.5 text-sm text-muted">{codeFor ? <>We sent a 6-digit code to <span className="font-medium text-fg">{codeFor}</span>. It expires in 10 minutes.</> : SUB[mode]}</p>
           {sp.get("reset") && mode === "sign-in" && (
             <p className="mt-4 rounded-xl bg-accent-soft px-3.5 py-2.5 text-sm text-accent-soft-fg">Password updated. Sign in with your new password.</p>
           )}
@@ -120,7 +149,35 @@ export default function AuthForm({ mode, googleEnabled = false }: { mode: Mode; 
             </>
           )}
 
-          {notice ? (
+          {codeFor ? (
+            <form onSubmit={onVerify} className="mt-7 space-y-3">
+              <label className="block">
+                <span className="mb-1.5 block text-[13px] font-medium">Code</span>
+                <input
+                  name="otp"
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  pattern="[0-9]{6}"
+                  maxLength={6}
+                  required
+                  autoFocus
+                  className={cn(input, "font-mono text-lg tracking-[0.4em]")}
+                  placeholder="000000"
+                />
+              </label>
+              {error && <p role="alert" className="rounded-lg bg-danger-soft px-3 py-2 text-sm text-danger">{error}</p>}
+              <Button type="submit" variant="primary" size="lg" disabled={busy} className="!mt-5 w-full">
+                {busy && <Loader2 size={16} className="animate-spin" />}
+                Verify and continue
+              </Button>
+              <p className="pt-1 text-sm text-muted">
+                Didn&apos;t get it? Check spam, or{" "}
+                <button type="button" onClick={resend} disabled={resent} className="font-medium text-fg underline underline-offset-2 disabled:no-underline disabled:opacity-70">
+                  {resent ? "new code sent" : "send a new code"}
+                </button>
+              </p>
+            </form>
+          ) : notice ? (
             <div className="mt-7 flex gap-3 rounded-xl border border-line bg-surface p-4 text-sm">
               <MailCheck size={18} className="shrink-0 text-accent" />
               {notice}

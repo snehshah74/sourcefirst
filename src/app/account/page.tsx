@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { desc, eq } from "drizzle-orm";
 import { ArrowRight, Info } from "lucide-react";
 import SiteHeader from "@/components/SiteHeader";
-import SavedSearches, { ConfirmEmail } from "@/components/SavedSearches";
+import SavedSearches from "@/components/SavedSearches";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { buttonClass } from "@/components/ui/Button";
 import { currentUser } from "@/lib/auth";
@@ -47,7 +47,6 @@ export default async function Account() {
               Email isn&apos;t configured on this server yet, so alerts are written to the server log instead of sent.
             </p>
           )}
-          {!user.emailVerified && <ConfirmEmail email={user.email} />}
           <SavedSearches initial={searches.map((s) => ({ id: s.id, name: s.name, query: s.query, alertsEnabled: s.alertsEnabled, frequency: s.frequency }))} />
         </section>
 

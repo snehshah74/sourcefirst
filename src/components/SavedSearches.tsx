@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useState } from "react";
 import { BellOff, BellRing, Search, Trash2 } from "lucide-react";
-import { authClient } from "@/lib/auth-client";
 import { Button } from "./ui/Button";
 import { toast } from "./ui/Toaster";
 import { cn } from "./ui/cn";
@@ -31,28 +30,6 @@ function describe(query: string): string[] {
   });
   if (!new URLSearchParams(query).has("us")) out.push("United States");
   return out;
-}
-
-/** Shown until the account's email is confirmed; alerts are held back until then. */
-export function ConfirmEmail({ email }: { email: string }) {
-  const [sent, setSent] = useState(false);
-  return (
-    <p className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 rounded-xl bg-info-soft px-3.5 py-2.5 text-[13px] text-info">
-      Confirm {email} to start getting alerts. Check your inbox for the link.
-      <button
-        type="button"
-        disabled={sent}
-        onClick={async () => {
-          const { error } = await authClient.sendVerificationEmail({ email, callbackURL: "/account" });
-          if (error) toast.error("Couldn't send the email", { description: error.message });
-          else setSent(true);
-        }}
-        className="font-medium underline underline-offset-2 disabled:no-underline disabled:opacity-70"
-      >
-        {sent ? "Sent" : "Send it again"}
-      </button>
-    </p>
-  );
 }
 
 export default function SavedSearches({ initial }: { initial: SavedSearch[] }) {
