@@ -42,6 +42,19 @@ function build(db: Awaited<ReturnType<typeof getDb>>) {
         });
       },
     },
+    // Alerts only go to confirmed addresses, so nobody can sign up with someone else's email and spam them.
+    emailVerification: {
+      sendOnSignUp: true,
+      autoSignInAfterVerification: true,
+      sendVerificationEmail: async ({ user, url }) => {
+        await sendEmail({
+          to: user.email,
+          subject: "Confirm your SourceFirst email",
+          text: `Confirm your email to start getting job alerts: ${url}\n\nIf you didn't sign up, ignore this email.`,
+          html: `<p>Confirm your email to start getting job alerts:</p><p><a href="${esc(url)}">${esc(url)}</a></p><p>If you didn't sign up, ignore this email.</p>`,
+        });
+      },
+    },
     socialProviders: google,
     session: { expiresIn: 60 * 60 * 24 * 30, updateAge: 60 * 60 * 24 },
     plugins: [nextCookies()],

@@ -72,7 +72,7 @@ const { eq } = await import("drizzle-orm");
 
 before(async () => {
   const db = await getDb();
-  await db.insert(schema.user).values({ id: "u1", name: "Tess", email: "tess@example.com" });
+  await db.insert(schema.user).values({ id: "u1", name: "Tess", email: "tess@example.com", emailVerified: true });
   await db.insert(schema.savedSearches).values({ userId: "u1", name: "Figma eng", query: "company=figma", frequency: "instant", lastAlertedAt: new Date(Date.now() - 1000) });
   // A daily digest that was just sent: must NOT fire again within the day.
   await db.insert(schema.savedSearches).values({ userId: "u1", name: "Daily figma", query: "company=figma&us=0", frequency: "daily", lastAlertedAt: new Date(Date.now() - 1000) });

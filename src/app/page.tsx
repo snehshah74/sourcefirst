@@ -38,7 +38,7 @@ export default async function Home() {
           <span className="tabular-nums">{s.companies.toLocaleString()}</span> career pages
         </h1>
         <p className="mt-4 max-w-xl text-[17px] leading-relaxed text-ink-muted sm:mt-5 sm:text-lg">
-          Roles show up here minutes after a company posts them, often hours before LinkedIn or Indeed. Apply while the pile is still small.
+          Roles show up here minutes after a company posts them, often hours before LinkedIn or Indeed. Be the first applicant, not the 500th.
         </p>
       </div>
 

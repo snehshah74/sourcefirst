@@ -2,7 +2,7 @@ import { and, count, desc, eq, gte, ilike, inArray, isNotNull, isNull, lte, max,
 import { getDb, schema } from "@/db";
 import type { JobRow } from "./types";
 
-const { jobs, companies, runs, hiddenJobs } = schema;
+const { jobs, companies, hiddenJobs } = schema;
 
 interface JobFilters {
   q?: string;
@@ -118,7 +118,7 @@ export async function stats() {
     db.select({ n: count() }).from(jobs).where(and(open, gte(jobs.first_seen_at, dayAgo))),
     db.select({ n: count() }).from(jobs).where(and(open, gte(jobs.first_seen_at, hourAgo))),
     db.select({ n: count() }).from(companies).where(isNotNull(companies.last_ok_at)),
-    db.select({ t: max(runs.finished_at) }).from(runs),
+    db.select({ t: max(companies.last_ok_at) }).from(companies),
   ]);
   return { openJobs: Number(a.n), jobsToday: Number(b.n), jobsLastHour: Number(c.n), companies: Number(d.n), lastRun: e.t ?? null };
 }

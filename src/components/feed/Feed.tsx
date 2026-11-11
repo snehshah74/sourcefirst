@@ -76,9 +76,8 @@ export default function Feed({ signedIn, hero }: { signedIn: boolean; hero?: Rea
   const [filtersOpen, setFiltersOpen] = useState(false);
   const prefs = usePrefs(signedIn);
   const [editingPrefs, setEditingPrefs] = useState(false);
-  // Whether the visitor arrived on a filtered link (then we don't interrupt them with onboarding).
-  const [arrivedFiltered] = useState(() => typeof window !== "undefined" && FILTER_PARAMS.some((k) => new URLSearchParams(window.location.search).has(k)));
-  const showOnboarding = editingPrefs || (prefs.loaded && !prefs.seen && !arrivedFiltered);
+  // Setup questions are for accounts: they appear once, right after sign-up, and again from "For you".
+  const showOnboarding = signedIn && (editingPrefs || (prefs.loaded && !prefs.seen));
 
   // Arriving with no filters in the URL? Start from the user's saved preferences ("For you").
   const applied = useRef(false);
@@ -86,8 +85,8 @@ export default function Feed({ signedIn, hero }: { signedIn: boolean; hero?: Rea
     if (applied.current || !prefs.loaded) return;
     applied.current = true;
     const hasFilters = FILTER_PARAMS.some((k) => new URLSearchParams(window.location.search).has(k));
-    if (prefs.prefs && !hasFilters) update(Object.fromEntries(prefsToQuery(prefs.prefs)));
-  }, [prefs.loaded, prefs.prefs, update]);
+    if (signedIn && prefs.prefs && !hasFilters) update(Object.fromEntries(prefsToQuery(prefs.prefs)));
+  }, [signedIn, prefs.loaded, prefs.prefs, update]);
 
   const applyPrefs = useCallback(
     async (p: Prefs, digest: boolean) => {
@@ -316,7 +315,7 @@ export default function Feed({ signedIn, hero }: { signedIn: boolean; hero?: Rea
         onCreateAlert={createAlert}
         onOpenFilters={() => setFiltersOpen(true)}
         filterCount={railCount}
-        forYou={{ active: forYouActive, hasPrefs: !!prefs.prefs, onClick: () => setEditingPrefs(true) }}
+        forYou={{ active: forYouActive, hasPrefs: !!prefs.prefs, onClick: () => (signedIn ? setEditingPrefs(true) : router.push("/sign-up")) }}
       />
 
       <div className="mx-auto grid w-full max-w-[1320px] grid-cols-[minmax(0,1fr)] gap-10 px-4 py-8 sm:px-6 lg:grid-cols-[220px_minmax(0,1fr)]">

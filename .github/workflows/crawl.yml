@@ -8,15 +8,18 @@
 #   SMTP_PASS       a Gmail App Password            ┘
 #   HEALTHCHECK_URL https://hc-ping.com/…           optional: emails you if crawls stop
 #
-# Cost: free and unlimited on a public repo. A private repo gets ~2,000 free minutes/month;
-# every-15-min runs use ~1,500–2,500, so switch the cron to "7,37 * * * *" (every 30 min) there.
-# GitHub can start scheduled runs a few minutes late, and pauses schedules in public repos
-# after 60 days without a commit.
+# Timing: GitHub's own schedule is unreliable (it often skips runs for hours), so each run queues
+# the next one itself, 15 minutes after it started. The schedule below is only a safety net that
+# restarts the chain if it ever breaks. The concurrency group keeps it to one chain.
+# To pause crawling: Actions → crawl → "…" → Disable workflow.
+#
+# Cost: free and unlimited on a public repo (the chain keeps one runner busy). Don't use this
+# chain on a private repo: it would use ~43,000 minutes/month against a ~2,000 minute allowance.
 name: crawl
 
 on:
   schedule:
-    # Every 15 minutes, offset from :00/:15/:30/:45, when GitHub is busiest and most often delays or skips runs.
+    # Safety net only (see "Timing" above); offset from :00, when GitHub is busiest.
     - cron: "7,22,37,52 * * * *"
   workflow_dispatch: {}
 
@@ -24,13 +27,19 @@ concurrency:
   group: crawl
   cancel-in-progress: false
 
+permissions:
+  contents: read
+  actions: write # lets a run queue the next run
+
 jobs:
   crawl:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
     steps:
+      - run: echo "STARTED=$(date +%s)" >> "$GITHUB_ENV"
+
       # Until the database secret exists there is nothing to crawl into, so skip cleanly instead of
       # crawling into a throwaway database and showing a misleading green run.
       - name: Check configuration
@@ -65,3 +74,13 @@ jobs:
           SMTP_PASS: ${{ secrets.SMTP_PASS }}
           EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
           HEALTHCHECK_URL: ${{ secrets.HEALTHCHECK_URL }}
+
+      # Even when a crawl fails, keep the 15-minute rhythm going.
+      - name: Queue the next crawl
+        if: always() && env.DATABASE_URL != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          wait=$(( 900 - ($(date +%s) - STARTED) ))
+          if [ "$wait" -gt 0 ]; then sleep "$wait"; fi
+          gh workflow run crawl.yml --repo "$GITHUB_REPOSITORY" --ref "$GITHUB_REF_NAME"

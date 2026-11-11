@@ -25,7 +25,7 @@ export async function sendAlerts(now = new Date()): Promise<number> {
     .select({ s: schema.savedSearches, email: schema.user.email, name: schema.user.name })
     .from(schema.savedSearches)
     .innerJoin(schema.user, eq(schema.user.id, schema.savedSearches.userId))
-    .where(eq(schema.savedSearches.alertsEnabled, true));
+    .where(and(eq(schema.savedSearches.alertsEnabled, true), eq(schema.user.emailVerified, true)));
 
   const due = rows.filter(({ s }) => s.frequency === "instant" || now.getTime() - s.lastAlertedAt.getTime() >= DIGEST_EVERY_MS);
   const byUser = new Map<string, { email: string; name: string; sections: Section[] }>();

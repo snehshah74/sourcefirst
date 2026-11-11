@@ -65,12 +65,12 @@ function extractMinExp(text: string): number | null {
 const CATEGORIES: [string, RegExp][] = [
   ["Engineering", /\b(engineer|developer|swe|sre|devops|architect|programmer|software|infrastructure|firmware|backend|frontend|full[- ]?stack|ios|android)\b/i],
   ["Data & AI", /\b(data|machine learning|ml|ai|llm|research scientist|scientist|analytics|business intelligence|bi analyst)\b/i],
-  ["Product", /\b(product manager|product owner|product lead|product analyst|product operations|pm\b|program manager|tpm)\b/i],
+  ["Product", /\b(product manager|product owner|product lead|product analyst|product operations|pm\b|technical program manager|tpm)\b/i],
   ["Design", /\b(design|designer|ux|ui|creative|artist)\b/i],
   ["Sales", /\b(sales|account executive|account manager|business development|bdr|sdr|partnerships?)\b/i],
   ["Marketing", /\b(marketing|growth|content|brand|communications|seo|community)\b/i],
   ["Customer", /\b(customer|support|success|solutions|implementation)\b/i],
-  ["Operations", /\b(operations|ops|supply chain|logistics|procurement|facilities|manufacturing|technician)\b/i],
+  ["Operations", /\b(operations|ops|program manager|supply chain|logistics|procurement|facilities|manufacturing|technician)\b/i],
   ["People", /\b(recruit\w*|sourcer|talent|people|hr|human resources)\b/i],
   ["Finance & Legal", /\b(finance|financial|fp&a|accounting|accountant|controller|tax|treasury|audit|legal|counsel|attorney|compliance|paralegal)\b/i],
 ];
@@ -82,7 +82,7 @@ const PRODUCT_ROLE = /\b(product (manager|management|owner)|(head|director|vp|vi
 
 function categorize(title: string, dept: string | null): string {
   if (PRODUCT_ROLE.test(title) && !/\b(recruit\w*|sourcer|talent)\b/i.test(title)) return "Product";
-  if (!/\bengineer/i.test(title)) for (const [name, re] of CATEGORIES) if (PRIORITY.includes(name) && re.test(title)) return name;
+  if (!/\b(engineer|design)/i.test(title)) for (const [name, re] of CATEGORIES) if (PRIORITY.includes(name) && re.test(title)) return name;
   for (const [name, re] of CATEGORIES) if (re.test(title)) return name;
   if (dept) for (const [name, re] of CATEGORIES) if (re.test(dept)) return name;
   if (/\banalyst\b/i.test(title)) return "Data & AI"; // last resort: most remaining analyst roles are analytics
