@@ -47,6 +47,7 @@ export function JobDetail({
   onSelect,
   onFilterCompany,
   onHide,
+  onGone,
   onClose,
 }: {
   jobId: string;
@@ -59,17 +60,33 @@ export function JobDetail({
   onSelect: (id: string) => void;
   onFilterCompany: (slug: string, name: string) => void;
   onHide?: (job: Job) => void;
+  /** Called when the company has taken this posting down, so the list can drop it. */
+  onGone?: (jobId: string) => void;
   onClose?: () => void;
 }) {
   const [detail, setDetail] = useState<Detail | null>(null);
-  const [failed, setFailed] = useState<string | null>(null);
+  // Per job: "gone" = the company took the posting down; "error" = we couldn't reach it right now.
+  const [failure, setFailure] = useState<{ jobId: string; kind: "gone" | "error" } | null>(null);
+  const goneRef = useRef(onGone);
+  useEffect(() => {
+    goneRef.current = onGone;
+  }, [onGone]);
 
   useEffect(() => {
     let alive = true;
     fetch(`/api/jobs/${encodeURIComponent(jobId)}`)
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
-      .then((d: Detail) => alive && setDetail(d))
-      .catch(() => alive && setFailed(jobId));
+      .then(async (r) => {
+        if (r.status === 410) {
+          if (!alive) return;
+          setFailure({ jobId, kind: "gone" });
+          goneRef.current?.(jobId);
+          return;
+        }
+        if (!r.ok) throw new Error(String(r.status));
+        const d: Detail = await r.json();
+        if (alive) setDetail(d);
+      })
+      .catch(() => alive && setFailure({ jobId, kind: "error" }));
     return () => {
       alive = false;
     };
@@ -94,11 +111,20 @@ export function JobDetail({
 
   const d = detail?.job.id === jobId ? detail : null;
   const job = d?.job ?? preview;
-  const error = failed === jobId && !d;
+  const failed = failure?.jobId === jobId && !d ? failure.kind : null;
 
+  if (failed === "gone")
+    return (
+      <div className="flex min-h-80 flex-col items-center justify-center gap-2 p-10 text-center">
+        <div className="grid h-11 w-11 place-items-center rounded-2xl bg-surface-2 text-subtle"><X size={20} /></div>
+        <p className="font-semibold">This job has been taken down</p>
+        <p className="max-w-xs text-sm text-muted">{preview ? `${preview.company_name} closed this posting, so we've removed it.` : "The company closed this posting, so we've removed it."}</p>
+        {onClose && <Button className="mt-3" onClick={onClose}>Back to jobs</Button>}
+      </div>
+    );
   if (!job)
-    return error ? (
-      <div className="grid h-full place-items-center p-10 text-center text-sm text-muted">This job is no longer available.</div>
+    return failed === "error" ? (
+      <div className="grid h-full min-h-80 place-items-center p-10 text-center text-sm text-muted">Couldn&apos;t load this job. Check your connection and try again.</div>
     ) : (
       <DetailSkeleton />
     );
@@ -258,6 +284,10 @@ export function JobDetail({
                 The full description isn&apos;t available here. <a href={job.url} target="_blank" rel="noreferrer" className="text-accent underline">Read it on the company site</a>.
               </p>
             )
+          ) : failed === "error" ? (
+            <p className="rounded-xl border border-dashed border-line p-4 text-sm text-muted">
+              Couldn&apos;t load the description right now. <a href={job.url} target="_blank" rel="noreferrer" className="text-accent underline">Read it on the company site</a>.
+            </p>
           ) : (
             <div className="space-y-2.5">
               {[92, 100, 85, 96, 70, 0, 88, 94, 60].map((w, i) => (w ? <div key={i} className="skeleton h-3.5" style={{ width: `${w}%` }} /> : <div key={i} className="h-2" />))}

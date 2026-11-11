@@ -176,6 +176,22 @@ export default function Feed({ signedIn }: { signedIn: boolean }) {
     [signedIn, requireSignIn, feed, select],
   );
 
+  // The company took a posting down since the last crawl: drop it from the list and move on.
+  const gone = useCallback(
+    (id: string) => {
+      const idx = feed.jobs.findIndex((j) => j.id === id);
+      if (idx === -1) return;
+      const next = feed.jobs[idx + 1] ?? feed.jobs[idx - 1];
+      const title = feed.jobs[idx].title;
+      feed.removeLocal(id);
+      if (isDesktop && selRef.current === id && next) {
+        select(next.id);
+        toast(`“${title}” was just taken down by the company`, { description: "We've removed it from your feed." });
+      }
+    },
+    [feed, isDesktop, select],
+  );
+
   const filterCompany = useCallback(
     (slug: string) => {
       update({ company: slug, job: null, q: null });
@@ -243,6 +259,7 @@ export default function Feed({ signedIn }: { signedIn: boolean }) {
     onSelect: select,
     onFilterCompany: filterCompany,
     onHide: hide,
+    onGone: gone,
   };
 
   return (

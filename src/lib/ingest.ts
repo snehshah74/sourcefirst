@@ -1,7 +1,7 @@
 import { and, eq, isNull, lt, sql } from "drizzle-orm";
 import { getDb, schema, type DB } from "@/db";
 import { COMPANIES, type Company } from "./companies";
-import { fetchCompanyJobs } from "./ats";
+import { FetchError, fetchCompanyJobs } from "./ats";
 import { enrich } from "./enrich";
 
 const { jobs, companies, runs } = schema;
@@ -18,6 +18,8 @@ interface IngestResult {
 
 /** A board that suddenly returns 0 jobs is usually a glitch. Only close its jobs after this many empty crawls in a row. */
 const EMPTY_CRAWLS_BEFORE_CLOSING = 3;
+/** A board that answers "not found" this many crawls in a row is switched off (still listed on /status). */
+const NOT_FOUND_CRAWLS_BEFORE_DISABLING = 3;
 /** A run older than this with no finish time is treated as crashed, so it doesn't block new runs forever. */
 const STALE_RUN_MS = 10 * 60_000;
 
@@ -61,9 +63,26 @@ async function crawlCompany(db: DB, c: Company, res: IngestResult) {
   try {
     raw = await fetchCompanyJobs(c);
   } catch (e) {
+    const failures = (row?.consecutive_failures ?? 0) + 1;
+    // "Not found" means the board itself is gone (company left this ATS or renamed it): its jobs can't be
+    // applied to anymore, so they leave the site right away. Timeouts and 5xx are temporary: jobs stay.
+    const gone = e instanceof FetchError && e.status === 404;
+    if (gone) {
+      const closed = await db
+        .update(jobs)
+        .set({ closed_at: now })
+        .where(and(eq(jobs.ats, c.ats), eq(jobs.company_slug, c.slug), isNull(jobs.closed_at)))
+        .returning({ id: jobs.id });
+      res.closedJobs += closed.length;
+    }
     await db
       .update(companies)
-      .set({ last_error_at: now, last_error: (e as Error).message, consecutive_failures: sql`${companies.consecutive_failures} + 1` })
+      .set({
+        last_error_at: now,
+        last_error: (e as Error).message,
+        consecutive_failures: failures,
+        ...(gone ? { open_jobs: 0, enabled: failures < NOT_FOUND_CRAWLS_BEFORE_DISABLING } : {}),
+      })
       .where(and(eq(companies.ats, c.ats), eq(companies.slug, c.slug)));
     res.companiesFailed.push(`${c.ats}/${c.slug} (${(e as Error).message})`);
     return;

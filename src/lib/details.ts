@@ -1,5 +1,5 @@
 import sanitizeHtml from "sanitize-html";
-import { decodeEntities, getJson } from "./ats";
+import { decodeEntities, FetchError, getJson } from "./ats";
 
 /**
  * Full job descriptions, fetched from the ATS on demand when someone opens a job.
@@ -29,43 +29,63 @@ const clean = (html: string) =>
     exclusiveFilter: (frame) => ["p", "div", "span", "li"].includes(frame.tag) && !frame.text.trim() && !frame.mediaChildren?.length,
   }).trim();
 
+/** Thrown when the ATS says the job (or its whole board) doesn't exist anymore. */
+class JobGone extends Error {}
+
+const notFound = (e: unknown) => e instanceof FetchError && e.status === 404;
+
 async function fetchHtml(ats: string, slug: string, atsJobId: string): Promise<string | null> {
-  if (ats === "greenhouse") {
-    const j = await getJson<{ content?: string }>(`https://boards-api.greenhouse.io/v1/boards/${encodeURIComponent(slug)}/jobs/${encodeURIComponent(atsJobId)}`, 2);
-    return j.content ? decodeEntities(j.content) : null;
-  }
-  if (ats === "lever") {
-    const j = await getJson<{ description?: string; lists?: { text: string; content: string }[]; additional?: string }>(
-      `https://api.lever.co/v0/postings/${encodeURIComponent(slug)}/${encodeURIComponent(atsJobId)}?mode=json`,
-      2,
-    );
-    const lists = (j.lists ?? []).map((l) => `<h3>${sanitizeHtml(l.text, { allowedTags: [] })}</h3><ul>${l.content}</ul>`).join("");
-    return [j.description, lists, j.additional].filter(Boolean).join("") || null;
-  }
-  if (ats === "ashby") {
-    let board = boardCache.get(slug);
-    if (!board || Date.now() - board.at > TTL) {
-      const d = await getJson<{ jobs: { id: string; descriptionHtml?: string }[] }>(`https://api.ashbyhq.com/posting-api/job-board/${encodeURIComponent(slug)}`, 2);
-      board = { at: Date.now(), jobs: d.jobs ?? [] };
-      remember(boardCache, slug, board);
+  try {
+    if (ats === "greenhouse") {
+      const j = await getJson<{ content?: string }>(`https://boards-api.greenhouse.io/v1/boards/${encodeURIComponent(slug)}/jobs/${encodeURIComponent(atsJobId)}`, 2);
+      return j.content ? decodeEntities(j.content) : null;
     }
-    return board.jobs.find((j) => j.id === atsJobId)?.descriptionHtml ?? null;
+    if (ats === "lever") {
+      const j = await getJson<{ description?: string; lists?: { text: string; content: string }[]; additional?: string }>(
+        `https://api.lever.co/v0/postings/${encodeURIComponent(slug)}/${encodeURIComponent(atsJobId)}?mode=json`,
+        2,
+      );
+      const lists = (j.lists ?? []).map((l) => `<h3>${sanitizeHtml(l.text, { allowedTags: [] })}</h3><ul>${l.content}</ul>`).join("");
+      return [j.description, lists, j.additional].filter(Boolean).join("") || null;
+    }
+    if (ats === "ashby") {
+      // Ashby only serves whole boards. A job missing from a cached copy may just be newer than the cache,
+      // so re-fetch once before concluding it's gone.
+      for (const forceFresh of [false, true]) {
+        let board = boardCache.get(slug);
+        const fetchNow = forceFresh || !board || Date.now() - board.at > TTL;
+        if (fetchNow) {
+          const d = await getJson<{ jobs: { id: string; descriptionHtml?: string }[] }>(`https://api.ashbyhq.com/posting-api/job-board/${encodeURIComponent(slug)}`, 2);
+          board = { at: Date.now(), jobs: d.jobs ?? [] };
+          remember(boardCache, slug, board);
+        }
+        const job = board!.jobs.find((j) => j.id === atsJobId);
+        if (job) return job.descriptionHtml ?? null;
+        if (fetchNow) throw new JobGone(); // not in a just-fetched board: really gone
+      }
+    }
+    return null;
+  } catch (e) {
+    if (notFound(e)) throw new JobGone();
+    throw e;
   }
-  return null;
 }
 
-/** Sanitized description HTML, or null if the ATS no longer has it (job likely closed). */
-export async function getDescription(ats: string, slug: string, atsJobId: string): Promise<string | null> {
+/**
+ * The job's sanitized description, fetched from the ATS.
+ * `gone: true` means the company has taken the posting down; `html: null` alone means it just has no text.
+ */
+export async function getDescription(ats: string, slug: string, atsJobId: string): Promise<{ html: string | null; gone: boolean }> {
   const key = `${ats}:${slug}:${atsJobId}`;
   const hit = cache.get(key);
-  if (hit && Date.now() - hit.at < TTL) return hit.html;
-  let html: string | null = null;
+  if (hit && Date.now() - hit.at < TTL) return { html: hit.html, gone: false };
   try {
     const raw = await fetchHtml(ats, slug, atsJobId);
-    html = raw ? clean(raw) : null;
-  } catch {
-    return null; // don't cache failures
+    const html = raw ? clean(raw) : null;
+    remember(cache, key, { at: Date.now(), html });
+    return { html, gone: false };
+  } catch (e) {
+    if (e instanceof JobGone) return { html: null, gone: true };
+    return { html: null, gone: false }; // network trouble: don't cache, don't judge
   }
-  remember(cache, key, { at: Date.now(), html });
-  return html;
 }

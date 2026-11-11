@@ -12,8 +12,13 @@ delete process.env.RESEND_API_KEY;
 
 // Fake ATS: the "figma" Greenhouse board returns whatever `board` holds; every other board is empty.
 let board: { id: number; title: string; location: string }[] = [];
+let figmaStatus = 200; // set to 404 to simulate the company deleting its board, 500 for an outage
 globalThis.fetch = (async (input: string | URL) => {
   const url = String(input);
+  if (url.includes("/boards/figma/") && figmaStatus !== 200) return new Response("{}", { status: figmaStatus });
+  // Single-job lookups (descriptions): job 999 has been taken down, job 998's server is having trouble.
+  if (url.includes("/boards/figma/jobs/999")) return new Response("{}", { status: 404 });
+  if (url.includes("/boards/figma/jobs/998")) return new Response("{}", { status: 503 });
   const body = url.includes("boards-api.greenhouse.io/v1/boards/figma/")
     ? {
         jobs: board.map((j) => ({
@@ -160,4 +165,45 @@ test("closed jobs older than the retention window are pruned", async () => {
   assert.ok(r.pruned >= 1);
   const [gone] = await db.select().from(schema.jobs).where(eq(schema.jobs.id, "greenhouse:2"));
   assert.equal(gone, undefined);
+});
+
+test("a board that returns 'not found' has its jobs removed on that same crawl", async () => {
+  board = [{ id: 1, title: "Software Engineer", location: "San Francisco, CA" }, { id: 6, title: "Designer", location: "Austin, TX" }];
+  await runPipeline("test");
+  assert.deepEqual(await openFigma(), ["1", "6"]);
+
+  figmaStatus = 404;
+  const r = await runPipeline("test");
+  assert.ok(r.closedJobs >= 2);
+  assert.deepEqual(await openFigma(), [], "no job from a deleted board may stay listed");
+});
+
+test("if the board comes back, its jobs come back", async () => {
+  figmaStatus = 200;
+  await runPipeline("test");
+  assert.deepEqual(await openFigma(), ["1", "6"]);
+});
+
+test("an outage (5xx) does not remove jobs", async () => {
+  figmaStatus = 500;
+  await runPipeline("test");
+  assert.deepEqual(await openFigma(), ["1", "6"]);
+  figmaStatus = 200;
+  await runPipeline("test");
+});
+
+test("a board that is 'not found' 3 crawls in a row stops being crawled", async () => {
+  const db = await getDb();
+  figmaStatus = 404;
+  for (let i = 0; i < 3; i++) await runPipeline("test");
+  const [c] = await db.select().from(schema.companies).where(eq(schema.companies.slug, "figma"));
+  assert.equal(c.enabled, false);
+  assert.equal(c.open_jobs, 0);
+  figmaStatus = 200;
+});
+
+test("a single posting the company took down is reported as gone; an outage is not", async () => {
+  const { getDescription } = await import("../src/lib/details");
+  assert.deepEqual(await getDescription("greenhouse", "figma", "999"), { html: null, gone: true });
+  assert.deepEqual(await getDescription("greenhouse", "figma", "998"), { html: null, gone: false });
 });

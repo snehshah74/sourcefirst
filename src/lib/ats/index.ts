@@ -3,7 +3,7 @@ import type { RawJob } from "../types";
 
 const UA = "SourceFirst-JobAggregator/0.1 (+https://github.com/)";
 
-class FetchError extends Error {
+export class FetchError extends Error {
   constructor(message: string, public status?: number) {
     super(message);
   }
