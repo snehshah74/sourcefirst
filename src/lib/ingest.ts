@@ -109,7 +109,9 @@ async function crawlCompany(db: DB, c: Company, res: IngestResult) {
   // (or a month back when the ATS doesn't say, so a backlog never looks "just found").
   // After that, first_seen = the moment this crawler discovered the job.
   const firstCrawl = !row?.first_crawled_at;
-  const enriched = result.jobs.map(enrich);
+  // One row per job id: a repeated id in one batch would make Postgres reject the whole board.
+  const unique = [...new Map(result.jobs.map((j) => [j.atsJobId, j])).values()];
+  const enriched = unique.map(enrich);
   const ids = enriched.map((j) => `${j.ats}:${j.atsJobId}`);
   const backlogDate = new Date(now.getTime() - 30 * DAY);
 

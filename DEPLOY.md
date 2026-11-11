@@ -46,7 +46,7 @@ Healthchecks.io emails you if the crawler stops.
    | `HEALTHCHECK_URL` | optional, from step 6 |
 2. Go to **Actions → crawl → Run workflow** to start the first crawl now. It takes 1–2 minutes and fills the database.
 3. After that it runs every 15 minutes by itself.
-   - **Private repo?** Edit `.github/workflows/crawl.yml` and change the cron to `"*/30 * * * *"` to stay within the free minutes.
+   - **Private repo?** Edit `.github/workflows/crawl.yml` and change the cron to `"7,37 * * * *"` (every 30 minutes) to stay within the free minutes.
    - GitHub pauses schedules in public repos after 60 days with no commits. Pushing any commit re-enables them.
 
 ## 4. Deploy the website (Vercel)

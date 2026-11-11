@@ -9,14 +9,15 @@
 #   HEALTHCHECK_URL https://hc-ping.com/…           optional: emails you if crawls stop
 #
 # Cost: free and unlimited on a public repo. A private repo gets ~2,000 free minutes/month;
-# every-15-min runs use ~1,500–2,500, so switch the cron to "*/30 * * * *" there.
+# every-15-min runs use ~1,500–2,500, so switch the cron to "7,37 * * * *" (every 30 min) there.
 # GitHub can start scheduled runs a few minutes late, and pauses schedules in public repos
 # after 60 days without a commit.
 name: crawl
 
 on:
   schedule:
-    - cron: "*/15 * * * *"
+    # Every 15 minutes, offset from :00/:15/:30/:45, when GitHub is busiest and most often delays or skips runs.
+    - cron: "7,22,37,52 * * * *"
   workflow_dispatch: {}
 
 concurrency:

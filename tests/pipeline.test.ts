@@ -32,11 +32,30 @@ globalThis.fetch = (async (input: string | URL) => {
           metadata: [],
         })),
       }
-    : url.includes("api.lever.co")
-      ? []
-      : { jobs: [] };
+    : emptyBoard(url);
   return new Response(JSON.stringify(body), { status: 200, headers: { "content-type": "application/json" } });
 }) as typeof fetch;
+
+/** An empty job board, in each ATS's own response format. */
+function emptyBoard(url: string): unknown {
+  if (url.includes("api.lever.co")) return [];
+  if (url.includes("myworkdayjobs.com")) return { total: 0, jobPostings: [] };
+  if (url.includes("api.smartrecruiters.com")) return { totalFound: 0, content: [] };
+  if (url.includes("ats.rippling.com/api/v2/board/dupe-test/jobs?"))
+    // Rippling lists one job once per location
+    return {
+      totalItems: 3,
+      items: [
+        { id: "a", name: "Engineer", url: "https://ats.rippling.com/dupe-test/jobs/a", locations: [{ name: "New York, NY", country: "United States" }] },
+        { id: "a", name: "Engineer", url: "https://ats.rippling.com/dupe-test/jobs/a", locations: [{ name: "Austin, TX", country: "United States" }] },
+        { id: "b", name: "Designer", url: "https://ats.rippling.com/dupe-test/jobs/b", locations: [{ name: "Remote", country: "United States", workplaceType: "REMOTE" }] },
+      ],
+    };
+  if (url.includes("ats.rippling.com")) return { totalItems: 0, items: [] };
+  if (url.includes("recruitee.com")) return { offers: [] };
+  if (url.includes("oraclecloud.com")) return { items: [{ TotalJobsCount: 0, requisitionList: [] }] };
+  return { jobs: [] }; // Greenhouse, Ashby, Workable
+}
 
 // Capture "sent" emails (dev mode logs them).
 const emails: string[] = [];
@@ -207,4 +226,13 @@ test("a single posting the company took down is reported as gone; an outage is n
   const figma = { ats: "greenhouse" as const, slug: "figma", name: "Figma" };
   assert.deepEqual(await getDescription(figma, "999"), { detail: null, gone: true });
   assert.deepEqual(await getDescription(figma, "998"), { detail: null, gone: false });
+});
+
+test("a job listed once per location becomes one job with all its locations", async () => {
+  const { fetchCompanyJobs } = await import("../src/lib/ats");
+  const r = await fetchCompanyJobs({ ats: "rippling", slug: "dupe-test", name: "Dupe Co" }, {});
+  assert.equal(r.jobs.length, 2);
+  const eng = r.jobs.find((j) => j.atsJobId === "a")!;
+  assert.equal(eng.location, "New York, NY, United States; Austin, TX, United States");
+  assert.equal(r.jobs.find((j) => j.atsJobId === "b")!.isRemote, true);
 });

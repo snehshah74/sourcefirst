@@ -222,11 +222,17 @@ export const rippling: Provider = {
       (j) => j.id,
       { full: true, limit: opts.limit },
     );
+    // Rippling repeats a job once per location: merge those into one job with all its locations.
+    const merged = new Map<string, RpItem>();
+    for (const j of items) {
+      const prev = merged.get(j.id);
+      merged.set(j.id, prev ? { ...prev, locations: [...(prev.locations ?? []), ...(j.locations ?? [])] } : j);
+    }
     return {
       complete,
-      total,
-      jobs: items.map((j) => {
-        const locs = j.locations ?? [];
+      total: merged.size,
+      jobs: [...merged.values()].map((j) => {
+        const locs = (j.locations ?? []).filter((l, i, all) => all.findIndex((x) => x.name === l.name) === i);
         return {
           ats: "rippling" as const,
           atsJobId: j.id,
