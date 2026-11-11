@@ -1,10 +1,11 @@
+import path from "node:path";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  cacheComponents: true,
-  partialPrefetching: true,
+  // PGlite loads its WASM/data files from its own package dir; pg has optional native deps.
+  serverExternalPackages: ["@electric-sql/pglite", "pg"],
   turbopack: {
+    root: path.resolve(import.meta.dirname),
     rules: {
       "*.css": {
         loaders: ["@tailwindcss/turbopack"],

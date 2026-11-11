@@ -1,26 +1,171 @@
 @import "tailwindcss";
 
+/* ───────── Design tokens ─────────
+   Light is the default; dark follows the OS unless the user picks a theme
+   (stored as <html data-theme="light|dark">). Components only use these tokens. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --bg: #fafaf9;
+  --surface: #ffffff;
+  --surface-2: #f4f4f2;
+  --surface-3: #ebebe8;
+  --fg: #111214;
+  --muted: #5d626b;
+  --subtle: #8a8f98;
+  --line: #e7e7e3;
+  --line-strong: #d6d6d1;
+  --accent: #0b8a4d;
+  --accent-hover: #097a44;
+  --accent-fg: #ffffff;
+  --accent-soft: #e5f5ec;
+  --accent-soft-fg: #08663a;
+  --danger: #c62f3c;
+  --danger-soft: #fdecee;
+  --warn: #9a6200;
+  --warn-soft: #fdf3e1;
+  --info: #2457c5;
+  --info-soft: #e8effc;
+  --ring: rgb(11 138 77 / 0.35);
+  --shadow-sm: 0 1px 2px rgb(16 18 20 / 0.05);
+  --shadow-md: 0 4px 16px -4px rgb(16 18 20 / 0.12), 0 2px 4px -2px rgb(16 18 20 / 0.06);
+  --shadow-lg: 0 24px 48px -12px rgb(16 18 20 / 0.22);
+  color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  :root:not([data-theme="light"]) {
+    --bg: #0b0c0e;
+    --surface: #131417;
+    --surface-2: #1a1b1f;
+    --surface-3: #232429;
+    --fg: #ededef;
+    --muted: #a0a4ab;
+    --subtle: #6f737b;
+    --line: #24262b;
+    --line-strong: #31343a;
+    --accent: #2fca7a;
+    --accent-hover: #4ad68c;
+    --accent-fg: #04140b;
+    --accent-soft: #0f2a1c;
+    --accent-soft-fg: #6ee3a3;
+    --danger: #f2626e;
+    --danger-soft: #2c1417;
+    --warn: #f0b44c;
+    --warn-soft: #2a2010;
+    --info: #79a2f2;
+    --info-soft: #141d30;
+    --ring: rgb(47 202 122 / 0.4);
+    --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+    --shadow-md: 0 4px 16px -4px rgb(0 0 0 / 0.6);
+    --shadow-lg: 0 24px 48px -12px rgb(0 0 0 / 0.7);
+    color-scheme: dark;
   }
 }
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+:root[data-theme="dark"] {
+  --bg: #0b0c0e;
+  --surface: #131417;
+  --surface-2: #1a1b1f;
+  --surface-3: #232429;
+  --fg: #ededef;
+  --muted: #a0a4ab;
+  --subtle: #6f737b;
+  --line: #24262b;
+  --line-strong: #31343a;
+  --accent: #2fca7a;
+  --accent-hover: #4ad68c;
+  --accent-fg: #04140b;
+  --accent-soft: #0f2a1c;
+  --accent-soft-fg: #6ee3a3;
+  --danger: #f2626e;
+  --danger-soft: #2c1417;
+  --warn: #f0b44c;
+  --warn-soft: #2a2010;
+  --info: #79a2f2;
+  --info-soft: #141d30;
+  --ring: rgb(47 202 122 / 0.4);
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-md: 0 4px 16px -4px rgb(0 0 0 / 0.6);
+  --shadow-lg: 0 24px 48px -12px rgb(0 0 0 / 0.7);
+  color-scheme: dark;
 }
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-subtle: var(--subtle);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-fg: var(--accent-fg);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-soft-fg: var(--accent-soft-fg);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+html { -webkit-text-size-adjust: 100%; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01", "cv11";
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+::selection { background: var(--accent-soft); color: var(--fg); }
+
+/* Scrollbars that don't shout */
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+* { scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
+
+/* ───────── Motion ───────── */
+@keyframes pulse-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .45; transform: scale(.85); } }
+.live-dot { animation: pulse-dot 1.8s ease-in-out infinite; }
+
+@keyframes shimmer { from { background-position: -400px 0; } to { background-position: 400px 0; } }
+.skeleton {
+  background: linear-gradient(90deg, var(--surface-2) 0%, var(--surface-3) 50%, var(--surface-2) 100%);
+  background-size: 800px 100%;
+  animation: shimmer 1.3s linear infinite;
+  border-radius: 6px;
+}
+
+@keyframes fade-up { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+.fade-up { animation: fade-up .18s ease-out both; }
+
+@keyframes sheet-in { from { transform: translateY(100%); } to { transform: none; } }
+@keyframes panel-in { from { transform: translateX(16px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes overlay-in { from { opacity: 0; } to { opacity: 1; } }
+.sheet-in { animation: sheet-in .22s cubic-bezier(.2,.8,.2,1) both; }
+.panel-in { animation: panel-in .2s cubic-bezier(.2,.8,.2,1) both; }
+.overlay-in { animation: overlay-in .15s ease-out both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .live-dot, .skeleton, .fade-up, .sheet-in, .panel-in, .overlay-in { animation: none; }
+}
+
+/* ───────── Rendered job descriptions (sanitized HTML from the ATS) ───────── */
+.prose-job { color: var(--fg); font-size: 14px; line-height: 1.65; }
+.prose-job :where(p, ul, ol) { margin: 0 0 .85em; }
+.prose-job :where(ul) { list-style: disc; padding-left: 1.25em; }
+.prose-job :where(ol) { list-style: decimal; padding-left: 1.25em; }
+.prose-job :where(li) { margin: .2em 0; }
+.prose-job :where(h1, h2, h3, h4) { font-weight: 600; font-size: 15px; margin: 1.4em 0 .5em; }
+.prose-job :where(strong, b) { font-weight: 600; }
+.prose-job :where(a) { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+.prose-job :where(hr) { border-color: var(--line); margin: 1.2em 0; }

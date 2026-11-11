@@ -1,0 +1,55 @@
+# Free 15-minute crawler. Runs the whole pipeline (crawl → alerts → prune) inside GitHub Actions
+# against your hosted Postgres, so it needs no paid scheduler and no long-running server.
+#
+# Setup: GitHub repo → Settings → Secrets and variables → Actions → "New repository secret":
+#   DATABASE_URL    Supabase "Session pooler" connection string (required)
+#   SITE_URL        https://your-app.vercel.app (used for links in alert emails)
+#   SMTP_USER       your Gmail address              ┐ optional: without these, alerts are only logged
+#   SMTP_PASS       a Gmail App Password            ┘
+#   HEALTHCHECK_URL https://hc-ping.com/…           optional: emails you if crawls stop
+#
+# Cost: free and unlimited on a public repo. A private repo gets ~2,000 free minutes/month;
+# every-15-min runs use ~1,500–2,500, so switch the cron to "*/30 * * * *" there.
+# GitHub can start scheduled runs a few minutes late, and pauses schedules in public repos
+# after 60 days without a commit.
+name: crawl
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch: {}
+
+concurrency:
+  group: crawl
+  cancel-in-progress: false
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Cache node_modules itself (not just the npm cache) so most runs skip installing entirely.
+      - id: deps
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: deps-${{ runner.os }}-node22-${{ hashFiles('package-lock.json') }}
+
+      - if: steps.deps.outputs.cache-hit != 'true'
+        run: npm ci --no-audit --no-fund
+
+      - name: Crawl, send alerts, prune
+        run: npx tsx scripts/ingest.ts --direct
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          SITE_URL: ${{ secrets.SITE_URL }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+          HEALTHCHECK_URL: ${{ secrets.HEALTHCHECK_URL }}

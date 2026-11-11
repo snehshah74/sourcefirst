@@ -1,0 +1,317 @@
+# Candidate companies for board discovery: "Name|domain" per line.
+# `npm run discover` probes Greenhouse, Lever and Ashby for each and records the boards that exist.
+# Add as many as you like; misses cost one request each.
+1Password|1password.com
+6sense|6sense.com
+Abnormal Security|abnormalsecurity.com
+Addepar|addepar.com
+Adyen|adyen.com
+Affinity|affinity.co
+Airbyte|airbyte.com
+Airship|airship.com
+Airwallex|airwallex.com
+Alation|alation.com
+Algolia|algolia.com
+Alloy|alloy.com
+Alma|helloalma.com
+AlphaSense|alpha-sense.com
+Amplitude|amplitude.com
+Anyscale|anyscale.com
+Apollo|apollo.io
+Applied Intuition|appliedintuition.com
+AppLovin|applovin.com
+Arcadia|arcadia.com
+Asana|asana.com
+Astranis|astranis.com
+Attentive|attentive.com
+Aurora|aurora.tech
+Autodesk|autodesk.com
+Axon|axon.com
+Baseten|baseten.co
+Benchling|benchling.com
+BetterUp|betterup.com
+Bilt Rewards|biltrewards.com
+BitGo|bitgo.com
+Block|block.xyz
+Blend|blend.com
+Boom Supersonic|boomsupersonic.com
+Box|box.com
+Braze|braze.com
+Brex|brex.com
+BuildOps|buildops.com
+Bumble|bumble.com
+Calendly|calendly.com
+Canva|canva.com
+Captions|captions.ai
+Celonis|celonis.com
+Census|getcensus.com
+Cerebras|cerebras.net
+Chainalysis|chainalysis.com
+ChargePoint|chargepoint.com
+Checkr|checkr.com
+Circle|circle.com
+Clari|clari.com
+Clay|clay.com
+Clever|clever.com
+ClickUp|clickup.com
+Clio|clio.com
+Cockroach Labs|cockroachlabs.com
+Coda|coda.io
+Cognition|cognition.ai
+Coinbase|coinbase.com
+Collective|collective.com
+Color|color.com
+Commure|commure.com
+Confluent|confluent.io
+ConsenSys|consensys.io
+Contentful|contentful.com
+Contentsquare|contentsquare.com
+Coursera|coursera.org
+Coupang|coupang.com
+Crusoe|crusoe.ai
+Culture Amp|cultureamp.com
+Customer.io|customer.io
+Dagster Labs|dagster.io
+Dashlane|dashlane.com
+Dataiku|dataiku.com
+dbt Labs|getdbt.com
+Deepgram|deepgram.com
+Descript|descript.com
+Dialpad|dialpad.com
+Discord|discord.com
+Divergent|divergent3d.com
+Docker|docker.com
+DoorDash|doordash.com
+Doximity|doximity.com
+Drata|drata.com
+DriveWealth|drivewealth.com
+Duolingo|duolingo.com
+Eight Sleep|eightsleep.com
+Elastic|elastic.co
+Epic Games|epicgames.com
+Etsy|etsy.com
+Eventbrite|eventbrite.com
+Faire|faire.com
+FanDuel|fanduel.com
+Fathom|fathom.video
+Fireblocks|fireblocks.com
+Firebolt|firebolt.io
+Fireworks AI|fireworks.ai
+Flock Safety|flocksafety.com
+Fly.io|fly.io
+Formlabs|formlabs.com
+Forter|forter.com
+Front|front.com
+Gem|gem.com
+Github|github.com
+Glean|glean.com
+GoodRx|goodrx.com
+Grafana Labs|grafana.com
+Grammarly|grammarly.com
+Graphite|graphite.dev
+Greenhouse|greenhouse.io
+Gusto|gusto.com
+Hackerone|hackerone.com
+Handshake|joinhandshake.com
+HashiCorp|hashicorp.com
+Headway|headway.co
+Hebbia|hebbia.ai
+Hex|hex.tech
+Hims & Hers|forhims.com
+Hinge Health|hingehealth.com
+Honor|joinhonor.com
+Hopper|hopper.com
+HubSpot|hubspot.com
+Hugging Face|huggingface.co
+Inflection|inflection.ai
+Instabase|instabase.com
+Intercom|intercom.com
+Ironclad|ironcladapp.com
+Iterable|iterable.com
+Jasper|jasper.ai
+Jerry|getjerry.com
+Kalshi|kalshi.com
+Klaviyo|klaviyo.com
+Kraken|kraken.com
+Labelbox|labelbox.com
+LangChain|langchain.com
+LaunchDarkly|launchdarkly.com
+Lattice|lattice.com
+Lime|li.me
+LinkedIn|linkedin.com
+Liquid Death|liquiddeath.com
+LlamaIndex|llamaindex.ai
+Loom|loom.com
+Lucid Software|lucid.co
+Luma AI|lumalabs.ai
+Marqeta|marqeta.com
+Masterclass|masterclass.com
+Mercury|mercury.com
+Meter|meter.com
+Metabase|metabase.com
+Mistral AI|mistral.ai
+Mixpanel|mixpanel.com
+Monday.com|monday.com
+Moveworks|moveworks.com
+MURAL|mural.co
+N26|n26.com
+Navan|navan.com
+Neo4j|neo4j.com
+Neon|neon.tech
+Netlify|netlify.com
+New Relic|newrelic.com
+Nextdoor|nextdoor.com
+Nuro|nuro.ai
+Nylas|nylas.com
+Okta|okta.com
+Omada Health|omadahealth.com
+OneSignal|onesignal.com
+Opendoor|opendoor.com
+OpenSea|opensea.io
+Oscar Health|hioscar.com
+Outschool|outschool.com
+Owner|owner.com
+Palantir|palantir.com
+PandaDoc|pandadoc.com
+Pathward|pathward.com
+Patreon|patreon.com
+Peloton|onepeloton.com
+Pendo|pendo.io
+Persona|withpersona.com
+Physical Intelligence|physicalintelligence.company
+Pilot|pilot.com
+Pinecone|pinecone.io
+Planet|planet.com
+PlanetScale|planetscale.com
+Plaid|plaid.com
+Podium|podium.com
+Postman|postman.com
+Prefect|prefect.io
+Productboard|productboard.com
+Pulumi|pulumi.com
+Qualtrics|qualtrics.com
+Quizlet|quizlet.com
+Ramp|ramp.com
+Recursion|recursion.com
+Redpanda|redpanda.com
+Relativity Space|relativityspace.com
+Remote|remote.com
+Render|render.com
+Retool|retool.com
+Rippling|rippling.com
+Rivian|rivian.com
+Robinhood|robinhood.com
+Rocket Lab|rocketlabusa.com
+Rubrik|rubrik.com
+Runway|runwayml.com
+Salesloft|salesloft.com
+Samsara|samsara.com
+Sanity|sanity.io
+Saronic|saronic.com
+Scale AI|scale.com
+Seatgeek|seatgeek.com
+Secureframe|secureframe.com
+Segment|segment.com
+Sentry|sentry.io
+ServiceTitan|servicetitan.com
+Shopify|shopify.com
+Sigma Computing|sigmacomputing.com
+Skydio|skydio.com
+Slack|slack.com
+Smartsheet|smartsheet.com
+Snorkel AI|snorkel.ai
+Snowflake|snowflake.com
+SoFi|sofi.com
+Sourcegraph|sourcegraph.com
+Splice|splice.com
+Spotify|spotify.com
+Sprinklr|sprinklr.com
+Squarespace|squarespace.com
+Stability AI|stability.ai
+StackBlitz|stackblitz.com
+Starburst|starburst.io
+Strava|strava.com
+Stytch|stytch.com
+Substack|substack.com
+Sumo Logic|sumologic.com
+Sunrun|sunrun.com
+SurveyMonkey|surveymonkey.com
+Synthesia|synthesia.io
+Tailscale|tailscale.com
+Tala|tala.co
+Tanium|tanium.com
+Tecton|tecton.ai
+Temporal|temporal.io
+Tempus|tempus.com
+Thumbtack|thumbtack.com
+Tines|tines.com
+Toast|toasttab.com
+Together AI|together.ai
+Truework|truework.com
+Turo|turo.com
+Twitch|twitch.tv
+Udemy|udemy.com
+Unit|unit.co
+Unity|unity.com
+Upstart|upstart.com
+Verkada|verkada.com
+Via|ridewithvia.com
+Weights & Biases|wandb.ai
+Whatnot|whatnot.com
+Whoop|whoop.com
+Wiz|wiz.io
+Wealthfront|wealthfront.com
+Workato|workato.com
+Writer|writer.com
+Xero|xero.com
+Yext|yext.com
+Zapier|zapier.com
+Zendesk|zendesk.com
+Zip|ziphq.com
+ZoomInfo|zoominfo.com
+Zocdoc|zocdoc.com
+Zscaler|zscaler.com
+Abridge|abridge.com
+Anrok|anrok.com
+Arc Boats|arcboats.com
+Attio|attio.com
+Bland AI|bland.ai
+Browserbase|browserbase.com
+Chroma|trychroma.com
+Codeium|codeium.com
+Cohere Health|coherehealth.com
+Commonwealth Fusion|cfs.energy
+Convex|convex.dev
+Cresta|cresta.com
+Daydream|daydream.ing
+Dust|dust.tt
+E2B|e2b.dev
+Eleven|eleven.ai
+Exa|exa.ai
+Fal|fal.ai
+Figure AI|figure.ai
+Groq|groq.com
+Hightouch|hightouch.com
+Imbue|imbue.com
+Inngest|inngest.com
+Lambda|lambdalabs.com
+Lindy|lindy.ai
+Mintlify|mintlify.com
+Motherduck|motherduck.com
+Nomic|nomic.ai
+Notable|notablehealth.com
+Pika|pika.art
+Pylon|usepylon.com
+Rad AI|radai.com
+Resend|resend.com
+Rillet|rillet.com
+Rogo|rogo.ai
+Scale Venture|scalevp.com
+Semgrep|semgrep.dev
+Skild AI|skild.ai
+Suno|suno.com
+Tavus|tavus.io
+Unstructured|unstructured.io
+Warp|warp.dev
+Watershed|watershed.com
+Zed|zed.dev
