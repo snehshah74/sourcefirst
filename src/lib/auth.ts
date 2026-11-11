@@ -1,7 +1,6 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
-import { emailOTP } from "better-auth/plugins";
 import { headers } from "next/headers";
 import { getDb, schema } from "@/db";
 import { esc, sendEmail } from "./email";
@@ -31,7 +30,7 @@ function build(db: Awaited<ReturnType<typeof getDb>>) {
     emailAndPassword: {
       enabled: true,
       minPasswordLength: 8,
-      requireEmailVerification: true,
+      autoSignIn: true,
       // A password reset signs the account out everywhere (e.g. if it was reset because it leaked).
       revokeSessionsOnPasswordReset: true,
       sendResetPassword: async ({ user, url }) => {
@@ -43,28 +42,9 @@ function build(db: Awaited<ReturnType<typeof getDb>>) {
         });
       },
     },
-    // Accounts confirm their email with a 6-digit code before they can sign in, so nobody can sign up
-    // with someone else's address (and alerts only ever reach confirmed inboxes).
-    emailVerification: { sendOnSignUp: true, sendOnSignIn: true, autoSignInAfterVerification: true },
     socialProviders: google,
     session: { expiresIn: 60 * 60 * 24 * 30, updateAge: 60 * 60 * 24 },
-    plugins: [
-      emailOTP({
-        overrideDefaultEmailVerification: true,
-        otpLength: 6,
-        expiresIn: 10 * 60,
-        storeOTP: "hashed",
-        sendVerificationOTP: async ({ email, otp }) => {
-          await sendEmail({
-            to: email,
-            subject: `${otp} is your SourceFirst code`,
-            text: `Your SourceFirst code is ${otp}\n\nIt expires in 10 minutes. If you didn't sign up, ignore this email.`,
-            html: `<p>Your SourceFirst code is</p><p style="font-size:28px;font-weight:600;letter-spacing:6px;font-family:monospace">${esc(otp)}</p><p>It expires in 10 minutes. If you didn't sign up, ignore this email.</p>`,
-          });
-        },
-      }),
-      nextCookies(), // must stay last
-    ],
+    plugins: [nextCookies()],
   });
 }
 
