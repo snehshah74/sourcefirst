@@ -1,0 +1,306 @@
+# Careers-page URLs on any supported ATS: "Name|domain|URL". Name and domain may be left empty
+# for SmartRecruiters/Workable/Rippling/Recruitee (read from the board). Then run `npm run discover`.
+Carrier|carrier.com|https://carrier.wd5.myworkdayjobs.com/en-US/jobs
+Workday|workday.com|https://workday.wd5.myworkdayjobs.com/Workday
+Buc-ee's|buc-ees.com|https://cfr.wd5.myworkdayjobs.com/Buc-careers
+Cleveland Clinic|clevelandclinic.org|https://ccf.wd1.myworkdayjobs.com/ClevelandClinicCareers
+Booster|boosterthon.com|https://booster.wd5.myworkdayjobs.com/Booster_Careers
+Crowe|crowe.com|https://crowe.wd12.myworkdayjobs.com/External_Careers
+S&P Global|spglobal.com|https://spgi.wd5.myworkdayjobs.com/SPGI_Careers
+DTLR|dtlr.com|https://jdgroupnam.wd1.myworkdayjobs.com/DTLR_Career_Site
+BlueCross BlueShield of Tennessee|bcbst.com|https://bcbst.wd1.myworkdayjobs.com/external
+Lennar|lennar.com|https://lennar.wd1.myworkdayjobs.com/Early_Careers
+OCLC|oclc.org|https://oclc.wd1.myworkdayjobs.com/OCLC_Careers
+Torch Technologies|torchtechnologies.com|https://starfish.wd501.myworkdayjobs.com/Careers
+J.M. Smucker|jmsmucker.com|https://smucker.wd5.myworkdayjobs.com/US_External_Careers
+Amgen|amgen.com|https://amgen.wd1.myworkdayjobs.com/Careers
+Banner Health|bannerhealth.com|https://bannerhealth.wd108.myworkdayjobs.com/Careers
+Genentech|gene.com|https://roche.wd3.myworkdayjobs.com/en-US/rog-a2o-gene
+Forcepoint|forcepoint.com|https://forcepoint.wd1.myworkdayjobs.com/external-careers
+CVS Health|cvshealth.com|https://cvshealth.wd1.myworkdayjobs.com/cvs_health_careers
+nCino|ncino.com|https://ncino.wd5.myworkdayjobs.com/nCinoCareers
+Weir|global.weir|https://weir.wd3.myworkdayjobs.com/Weir_External_Careers
+Sysco|sysco.com|https://sysco.wd5.myworkdayjobs.com/syscocareers
+Elanco|elanco.com|https://elanco.wd5.myworkdayjobs.com/External_Career
+Mitsubishi Chemical Group|mcgc.com|https://mitsubishichemicalgroup.wd3.myworkdayjobs.com/MCCGroupCareers
+NextDecade|next-decade.com|https://nextdecade.wd501.myworkdayjobs.com/GlobalCareers
+QTS Data Centers|qtsdatacenters.com|https://qtsdatacenters.wd5.myworkdayjobs.com/qts
+College Board|collegeboard.org|https://collegeboard.wd1.myworkdayjobs.com/Careers
+Stoneridge|stoneridge.com|https://stoneridge.wd5.myworkdayjobs.com/Careers
+Voya Financial|voya.com|https://godirect.wd5.myworkdayjobs.com/voya_jobs
+The Atlantic|theatlantic.com|https://atlanticmedia.wd1.myworkdayjobs.com/Careers
+Holman|holman.com|https://holmanautogroup.wd1.myworkdayjobs.com/HolmanEnterprisesCareers
+Sunrise Senior Living|sunriseseniorliving.com|https://sunriseseniorliving.wd12.myworkdayjobs.com/SUNRISE_EXT_CAREERS
+PNC|pnc.com|https://pnc.wd5.myworkdayjobs.com/External
+MFS Investment Management|mfs.com|https://mfs.wd1.myworkdayjobs.com/MFS-Careers
+Schweitzer Engineering Laboratories|selinc.com|https://selinc.wd1.myworkdayjobs.com/SEL
+Allegion|allegion.com|https://allegion.wd5.myworkdayjobs.com/careers
+Hancock Whitney|hancockwhitney.com|https://hancockwhitney.wd5.myworkdayjobs.com/Careers
+Unilever|unilever.com|https://unilever.wd3.myworkdayjobs.com/Unilever_Experienced_Professionals
+Continental Resources|clr.com|https://clr.wd5.myworkdayjobs.com/CLR_Careers
+Sierra Nevada Corporation|sncorp.com|https://snc.wd1.myworkdayjobs.com/SNC_External_Career_Site
+Kokosing|kokosing.biz|https://kokosing.wd5.myworkdayjobs.com/Kokosing_External_Career_Site
+Packsize|packsize.com|https://packsize.wd108.myworkdayjobs.com/Packsize_Careers
+Talen Energy|talenenergy.com|https://talenenergy.wd1.myworkdayjobs.com/TalenCareers
+National Geographic Society|nationalgeographic.org|https://ngs.wd1.myworkdayjobs.com/ngs_external_career_site
+Shelter Insurance|shelterinsurance.com|https://shelterinsurance.wd5.myworkdayjobs.com/careers
+Prime Therapeutics|primetherapeutics.com|https://primetherapeutics.wd1.myworkdayjobs.com/PrimeTherapeuticsCareers
+Central Hudson|cenhud.com|https://cenhud.wd5.myworkdayjobs.com/cenhud
+Horizon Media|horizonmedia.com|https://horizonmedia.wd1.myworkdayjobs.com/CareerOpportunities
+Thomson Reuters|thomsonreuters.com|https://thomsonreuters.wd5.myworkdayjobs.com/External_Career_Site
+DAC Group|dacgroup.com|https://dacgroup.wd10.myworkdayjobs.com/EXT
+Ferguson|ferguson.com|https://ferguson.wd1.myworkdayjobs.com/Ferguson_Experienced
+AssetMark|assetmark.com|https://assetmark.wd5.myworkdayjobs.com/AssetMark_Careers
+BD|bd.com|https://bdx.wd1.myworkdayjobs.com/EXTERNAL_CAREER_SITE_USA
+Meijer|meijer.com|https://meijer.wd5.myworkdayjobs.com/Meijer_Stores_Hourly
+Montage Hotels|montagehotels.com|https://montage.wd1.myworkdayjobs.com/Montage_International
+AIG|aig.com|https://aig.wd1.myworkdayjobs.com/early_careers
+Williams|williams.com|https://williams.wd5.myworkdayjobs.com/External
+RELX|relx.com|https://relx.wd3.myworkdayjobs.com/relx
+AMB Sports & Entertainment|ambse.com|https://ambgroup.wd1.myworkdayjobs.com/AMBSE
+NVIDIA|nvidia.com|https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite
+Salesforce|salesforce.com|https://salesforce.wd12.myworkdayjobs.com/External_Career_Site
+Adobe|adobe.com|https://adobe.wd5.myworkdayjobs.com/external_experienced
+Intel|intel.com|https://intel.wd1.myworkdayjobs.com/External
+Walmart|walmart.com|https://walmart.wd5.myworkdayjobs.com/WalmartExternal
+Mastercard|mastercard.com|https://mastercard.wd1.myworkdayjobs.com/CorporateCareers
+Capital One|capitalone.com|https://capitalone.wd12.myworkdayjobs.com/Capital_One
+Target|target.com|https://target.wd5.myworkdayjobs.com/targetcareers
+PayPal|paypal.com|https://paypal.wd1.myworkdayjobs.com/jobs
+Dell Technologies|dell.com|https://dell.wd1.myworkdayjobs.com/External
+HP|hp.com|https://hp.wd5.myworkdayjobs.com/ExternalCareerSite
+Boeing|boeing.com|https://boeing.wd1.myworkdayjobs.com/EXTERNAL_CAREERS
+Disney|disney.com|https://disney.wd5.myworkdayjobs.com/disneycareer
+CrowdStrike|crowdstrike.com|https://crowdstrike.wd5.myworkdayjobs.com/crowdstrikecareers
+Comcast|comcast.com|https://comcast.wd5.myworkdayjobs.com/Comcast_Careers
+BlackRock|blackrock.com|https://blackrock.wd1.myworkdayjobs.com/BlackRock_Professional
+Broadcom|broadcom.com|https://broadcom.wd1.myworkdayjobs.com/External_Career
+Autodesk|autodesk.com|https://autodesk.wd1.myworkdayjobs.com/Ext
+Zoom|zoom.us|https://zoom.wd5.myworkdayjobs.com/Zoom
+Yahoo|yahoo.com|https://yahoo.wd5.myworkdayjobs.com/careers
+Motorola Solutions|motorolasolutions.com|https://motorolasolutions.wd5.myworkdayjobs.com/Careers
+Pfizer|pfizer.com|https://pfizer.wd1.myworkdayjobs.com/PfizerCareers
+Gilead|gilead.com|https://gilead.wd1.myworkdayjobs.com/gileadcareers
+Humana|humana.com|https://humana.wd5.myworkdayjobs.com/Humana_External_Career_Site
+Nike|nike.com|https://nike.wd1.myworkdayjobs.com/nke
+Accenture|accenture.com|https://accenture.wd103.myworkdayjobs.com/AccentureCareers
+PwC|pwc.com|https://pwc.wd3.myworkdayjobs.com/Global_Experienced_Careers
+Red Hat|redhat.com|https://redhat.wd5.myworkdayjobs.com/jobs
+Micron|micron.com|https://micron.wd1.myworkdayjobs.com/External
+Qualcomm|qualcomm.com|https://qualcomm.wd5.myworkdayjobs.com/External
+Analog Devices|analog.com|https://analogdevices.wd1.myworkdayjobs.com/External
+Northrop Grumman|northropgrumman.com|https://ngc.wd1.myworkdayjobs.com/Northrop_Grumman_External_Site
+RTX|rtx.com|https://globalhr.wd5.myworkdayjobs.com/REC_RTX_Ext_Gateway
+General Motors|gm.com|https://generalmotors.wd5.myworkdayjobs.com/Careers_GM
+Chevron|chevron.com|https://chevron.wd5.myworkdayjobs.com/jobs
+McKesson|mckesson.com|https://mckesson.wd1.myworkdayjobs.com/External_Careers
+Cardinal Health|cardinalhealth.com|https://cardinalhealth.wd1.myworkdayjobs.com/EXT
+Abbott|abbott.com|https://abbott.wd5.myworkdayjobs.com/abbottcareers
+Medtronic|medtronic.com|https://medtronic.wd1.myworkdayjobs.com/MedtronicCareers
+Thermo Fisher Scientific|thermofisher.com|https://thermofisher.wd5.myworkdayjobs.com/ThermoFisherCareers
+Zillow|zillow.com|https://zillow.wd5.myworkdayjobs.com/Zillow_Group_External
+Warner Bros. Discovery|wbd.com|https://warnerbros.wd5.myworkdayjobs.com/global
+Nasdaq|nasdaq.com|https://nasdaq.wd1.myworkdayjobs.com/Global_External_Site
+Workiva|workiva.com|https://workiva.wd1.myworkdayjobs.com/careers
+NetApp|netapp.com|https://netapp.wd1.myworkdayjobs.com/NetApp_Careers
+JPMorgan Chase|jpmorganchase.com|https://jpmc.fa.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1001
+Albertsons|albertsons.com|https://eofd.fa.us6.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1001
+Oracle|oracle.com|https://eeho.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/jobsearch
+WM|wm.com|https://emcm.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/WMCareers
+Citizens Bank|citizensbank.com|https://hcgn.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1
+Caesars Entertainment|caesars.com|https://edmn.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1
+Hilton|hilton.com|https://efet.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1
+Honeywell|honeywell.com|https://ibqbjb.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/Honeywell
+WSP|wsp.com|https://emit.fa.ca3.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_2001
+Ipsos|ipsos.com|https://ecqf.fa.em2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/IpsosCareers
+CSC|cscglobal.com|https://hczw.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1001
+Con Edison|coned.com|https://ejcu.fa.us6.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1033
+Myriad Genetics|myriad.com|https://ekgn.fa.us6.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_2001
+Holland America Group|hollandamerica.com|https://eicl.fa.em5.oraclecloud.com/hcmUI/CandidateExperience/en/sites/HAGroup
+Encompass Health|encompasshealth.com|https://ibwsjb.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1
+Adventist Health|adventisthealth.org|https://ecvz.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1
+Community Health Systems|chs.net|https://fa-evxo-saasfaprod1.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1
+Camden Property Trust|camdenliving.com|https://ehap.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX
+EXL|exlservice.com|https://fa-ewjt-saasfaprod1.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_2
+||https://careers.smartrecruiters.com/DiscoveryBehavioralHealth
+||https://careers.smartrecruiters.com/TAPI
+||https://careers.smartrecruiters.com/haufegroup
+||https://careers.smartrecruiters.com/gerresheimer
+||https://careers.smartrecruiters.com/colliers1
+||https://careers.smartrecruiters.com/CliffordChance
+||https://careers.smartrecruiters.com/SYNTEGON
+||https://careers.smartrecruiters.com/sobi
+||https://careers.smartrecruiters.com/judobank
+||https://careers.smartrecruiters.com/nearmap
+||https://careers.smartrecruiters.com/Akuo
+||https://careers.smartrecruiters.com/M1Finance
+||https://careers.smartrecruiters.com/EndeavourGroupCareers
+||https://careers.smartrecruiters.com/CanyonGBS
+||https://careers.smartrecruiters.com/egisgroup
+||https://careers.smartrecruiters.com/VeoliaEnvironnementSA
+||https://careers.smartrecruiters.com/ifs1
+||https://careers.smartrecruiters.com/HomeXpressMortgageCorp
+||https://careers.smartrecruiters.com/UNLEASH
+||https://careers.smartrecruiters.com/INNERGY1
+||https://careers.smartrecruiters.com/priviahealth
+||https://careers.smartrecruiters.com/rodeofx
+||https://careers.smartrecruiters.com/Wix2
+||https://careers.smartrecruiters.com/brainlab
+||https://careers.smartrecruiters.com/SIXT
+||https://careers.smartrecruiters.com/tipico
+||https://careers.smartrecruiters.com/SopraSteria1
+||https://careers.smartrecruiters.com/ACCESA
+||https://careers.smartrecruiters.com/datacatalystllc
+||https://careers.smartrecruiters.com/imsnanofabricationgmbh
+||https://careers.smartrecruiters.com/WilliamsRacing
+||https://careers.smartrecruiters.com/LLNL
+||https://careers.smartrecruiters.com/WestgateResorts
+||https://careers.smartrecruiters.com/gameloft
+||https://careers.smartrecruiters.com/LEONI1
+||https://careers.smartrecruiters.com/REWEInternationalDienstleistungsgesellschaftmbH
+||https://careers.smartrecruiters.com/conforama
+||https://careers.smartrecruiters.com/Covista
+||https://careers.smartrecruiters.com/MicroStrategy1
+||https://careers.smartrecruiters.com/KaufmanBroad
+||https://careers.smartrecruiters.com/budgetly
+||https://careers.smartrecruiters.com/cornerstonebuildingbrands1
+||https://careers.smartrecruiters.com/CircleLogistics1
+||https://careers.smartrecruiters.com/groupementmousquetaires
+||https://careers.smartrecruiters.com/eversana1
+||https://careers.smartrecruiters.com/ColliersInternationalEMEA
+||https://careers.smartrecruiters.com/miltenyibiotec1
+||https://careers.smartrecruiters.com/ajbell1
+||https://careers.smartrecruiters.com/believe
+||https://careers.smartrecruiters.com/turnertownsend
+||https://careers.smartrecruiters.com/RHG
+||https://careers.smartrecruiters.com/LegalAndGeneral
+||https://careers.smartrecruiters.com/beumergroup1
+||https://careers.smartrecruiters.com/BlueOptima
+||https://careers.smartrecruiters.com/SyngentaGroup
+||https://careers.smartrecruiters.com/PQ
+||https://careers.smartrecruiters.com/Loxam
+||https://careers.smartrecruiters.com/quadient1
+||https://careers.smartrecruiters.com/thirdbridge
+||https://careers.smartrecruiters.com/KOSTALGroup
+||https://careers.smartrecruiters.com/KPN
+||https://careers.smartrecruiters.com/standardbankgroup
+||https://careers.smartrecruiters.com/m3usa
+||https://careers.smartrecruiters.com/BoschGroup
+||https://careers.smartrecruiters.com/ServiceNow
+||https://careers.smartrecruiters.com/Ubisoft2
+||https://apply.workable.com/skeepers/
+||https://apply.workable.com/oakengage/
+||https://apply.workable.com/groundfloor/
+||https://apply.workable.com/joinmakropro/
+||https://apply.workable.com/a2mac1/
+||https://apply.workable.com/momos/
+||https://apply.workable.com/organox/
+||https://apply.workable.com/k1x/
+||https://apply.workable.com/spotlightsportsgroup/
+||https://apply.workable.com/cuberm/
+||https://apply.workable.com/hint/
+||https://apply.workable.com/kroo/
+||https://apply.workable.com/cogna/
+||https://apply.workable.com/arondite/
+||https://apply.workable.com/treatwell/
+||https://apply.workable.com/laravel/
+||https://apply.workable.com/pinely/
+||https://apply.workable.com/keycafe/
+||https://apply.workable.com/estimateone/
+||https://apply.workable.com/revstar/
+||https://apply.workable.com/remotepass/
+||https://apply.workable.com/voyc/
+||https://apply.workable.com/teamified/
+||https://apply.workable.com/forcemetrics/
+||https://apply.workable.com/leucine/
+||https://apply.workable.com/policystreet/
+||https://apply.workable.com/yodeck/
+||https://apply.workable.com/navig8/
+||https://apply.workable.com/apna/
+||https://apply.workable.com/strise/
+||https://apply.workable.com/nextern/
+||https://apply.workable.com/junobio/
+||https://apply.workable.com/terrapay/
+||https://apply.workable.com/youtrip/
+||https://apply.workable.com/zyte/
+||https://apply.workable.com/fairmoney/
+||https://apply.workable.com/vitalitygroup/
+||https://apply.workable.com/altalink/
+||https://apply.workable.com/vesuvius/
+||https://apply.workable.com/hudabeauty/
+||https://apply.workable.com/vezeeta/
+||https://apply.workable.com/haus/
+||https://apply.workable.com/brandbastion/
+||https://apply.workable.com/freelancer/
+||https://apply.workable.com/lovingly/
+||https://apply.workable.com/luminance-1/
+||https://apply.workable.com/fathom-robotics/
+||https://apply.workable.com/huggingface/
+||https://ats.rippling.com/aalo-atomics/jobs
+||https://ats.rippling.com/canada-rocket-company/jobs
+||https://ats.rippling.com/atmoszero-careers/jobs
+||https://ats.rippling.com/steno-careers-page/jobs
+||https://ats.rippling.com/aalyria-careers/jobs
+||https://ats.rippling.com/nutrient/jobs
+||https://ats.rippling.com/wander/jobs
+||https://ats.rippling.com/novella/jobs
+||https://ats.rippling.com/thoughtspot/jobs
+||https://ats.rippling.com/evgo_careers/jobs
+||https://ats.rippling.com/createmusicgroup/jobs
+||https://ats.rippling.com/bay-fc-jobs/jobs
+||https://ats.rippling.com/nodecraft/jobs
+||https://ats.rippling.com/bollandbranch/jobs
+||https://ats.rippling.com/webull/jobs
+||https://ats.rippling.com/amika-careers/jobs
+||https://ats.rippling.com/sibros-technologies/jobs
+||https://ats.rippling.com/lime-technology/jobs
+||https://ats.rippling.com/absencesoft/jobs
+||https://ats.rippling.com/smartwyre/jobs
+||https://ats.rippling.com/sumersports/jobs
+||https://ats.rippling.com/halborn/jobs
+||https://ats.rippling.com/positron/jobs
+||https://ats.rippling.com/corva/jobs
+||https://ats.rippling.com/slangai/jobs
+||https://ats.rippling.com/anaconda/jobs
+||https://ats.rippling.com/ephemeris-net/jobs
+||https://ats.rippling.com/framework/jobs
+||https://ats.rippling.com/chess/jobs
+||https://ats.rippling.com/fia-technology-services/jobs
+||https://ats.rippling.com/darkvision/jobs
+||https://ats.rippling.com/blackrockneurotech/jobs
+||https://ats.rippling.com/assembly-software/jobs
+||https://ats.rippling.com/nocd/jobs
+||https://ats.rippling.com/calibrate/jobs
+||https://ats.rippling.com/talentneuroncareers/jobs
+||https://ats.rippling.com/netatwork/jobs
+||https://ats.rippling.com/oneorigin/jobs
+||https://ats.rippling.com/axios-hq/jobs
+||https://ats.rippling.com/rippling/jobs
+||https://xite.recruitee.com/
+||https://trackman.recruitee.com/
+||https://chaos.recruitee.com/
+||https://hydrosat.recruitee.com/
+||https://framestore.recruitee.com/
+||https://skytree.recruitee.com/
+||https://nucsai.recruitee.com/
+||https://enspired.recruitee.com/
+||https://weeztix.recruitee.com/
+||https://verticalcompute.recruitee.com/
+||https://miaplaza.recruitee.com/
+||https://upslide.recruitee.com/
+||https://trafilea.recruitee.com/
+||https://livezoku.recruitee.com/
+||https://atgeurope.recruitee.com/
+||https://crazygames.recruitee.com/
+||https://metyisag.recruitee.com/
+||https://plantix.recruitee.com/
+||https://techwolf.recruitee.com/
+||https://aidigital.recruitee.com/
+||https://apptweak.recruitee.com/
+||https://hike2.recruitee.com/
+||https://huuuge.recruitee.com/
+||https://saga.recruitee.com/
+||https://zensai.recruitee.com/
+||https://gtowizard.recruitee.com/
+||https://talkieai.recruitee.com/
+||https://bunq.recruitee.com/

@@ -4,7 +4,7 @@ import { LANDINGS } from "@/lib/seo";
 import { Logo } from "./ui/Logo";
 
 const FAQ = [
-  ["How do jobs show up here before LinkedIn?", "Companies post a role in their applicant tracking system (Greenhouse, Lever, Ashby) first. Big job boards only pick it up later through syndication or scraping. We read those career pages directly, every 15 minutes."],
+  ["How do jobs show up here before LinkedIn?", "Companies post a role in their applicant tracking system (Workday, Greenhouse, Lever, Ashby, SmartRecruiters and others) first. Big job boards only pick it up later through syndication or scraping. We read those career pages directly, every 15 minutes."],
   ["How fresh is the feed?", "Every tracked company's careers page is checked every 15 minutes. The time on each job is when we first found it, and the list updates itself while you browse."],
   ["How is visa sponsorship detected?", "We scan each description for explicit language such as \"we sponsor visas\", \"no sponsorship\", \"must be a US citizen\" or ITAR. When a posting says nothing, it's marked Not stated. Always confirm with the employer."],
   ["Is it free?", "Yes. Browsing and filtering are open to everyone. A free account adds saved jobs, an application tracker, and email alerts for new matches."],

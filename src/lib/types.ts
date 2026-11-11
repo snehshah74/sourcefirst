@@ -1,4 +1,4 @@
-export type Ats = "greenhouse" | "lever" | "ashby";
+export type Ats = "greenhouse" | "lever" | "ashby" | "workday" | "smartrecruiters" | "workable" | "rippling" | "recruitee" | "oracle";
 
 export type Visa = "Yes" | "No" | "Maybe";
 

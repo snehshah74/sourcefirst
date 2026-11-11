@@ -1,19 +1,25 @@
 import type { Ats } from "./types";
-import discovered from "./companies.discovered.json";
+import discoveredJson from "./companies.discovered.json";
 
 /**
- * Starter list of companies and their public ATS board tokens.
- * The token is the path segment in the company's job board URL, e.g.
- *   boards.greenhouse.io/<token>   jobs.lever.co/<token>   jobs.ashbyhq.com/<token>
- * Growing this list is the main lever for coverage.
- * Add more with `npm run discover -- <ats> <token> [domain]` or by editing this file.
+ * Companies and their public ATS boards. `slug` is the board's id in its URL, e.g.
+ *   boards.greenhouse.io/<slug>  jobs.lever.co/<slug>  jobs.ashbyhq.com/<slug>
+ *   careers.smartrecruiters.com/<slug>  apply.workable.com/<slug>  ats.rippling.com/<slug>  <slug>.recruitee.com
+ * Workday and Oracle also need `board` = { host, site } (from their careers URL).
+ * Growing this list is the main lever for coverage: see `npm run discover`.
  */
 export interface Company {
   ats: Ats;
   slug: string;
   name: string;
   domain?: string;
+  board?: { host: string; site: string };
 }
+
+interface Discovered extends Company {
+  jobs: number;
+}
+const discovered = discoveredJson as Discovered[];
 
 const gh = (slug: string, name: string, domain?: string): Company => ({ ats: "greenhouse", slug, name, domain });
 const lv = (slug: string, name: string, domain?: string): Company => ({ ats: "lever", slug, name, domain });
@@ -104,7 +110,7 @@ const BLOCKLIST = new Set(["lever/linkedin"]);
 function merge(): Company[] {
   const out = new Map<string, Company>(MANUAL.map((c) => [`${c.ats}/${c.slug.toLowerCase()}`, c]));
   const manualNames = new Set(MANUAL.map((c) => c.name.toLowerCase()));
-  const best = new Map<string, (typeof discovered)[number]>();
+  const best = new Map<string, Discovered>();
   for (const d of discovered) {
     if (BLOCKLIST.has(`${d.ats}/${d.slug}`) || manualNames.has(d.name.toLowerCase())) continue;
     const cur = best.get(d.name);
@@ -112,7 +118,7 @@ function merge(): Company[] {
   }
   for (const d of best.values()) {
     const key = `${d.ats}/${d.slug.toLowerCase()}`;
-    if (!out.has(key)) out.set(key, { ats: d.ats as Ats, slug: d.slug, name: d.name, domain: d.domain });
+    if (!out.has(key)) out.set(key, { ats: d.ats, slug: d.slug, name: d.name, domain: d.domain, board: d.board });
   }
   return [...out.values()].filter((c) => !BLOCKLIST.has(`${c.ats}/${c.slug}`));
 }

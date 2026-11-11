@@ -8,7 +8,7 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 
 export const metadata: Metadata = {
   title: "SourceFirst · Jobs straight from company career portals",
-  description: "Tech jobs pulled directly from Greenhouse, Lever and Ashby every 15 minutes, before they hit the big job boards.",
+  description: "Jobs pulled straight from company career pages (Workday, Greenhouse, Lever, Ashby, SmartRecruiters and more) every 15 minutes, before they hit the big job boards.",
 };
 
 export const viewport: Viewport = {

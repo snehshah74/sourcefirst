@@ -204,6 +204,7 @@ test("a board that is 'not found' 3 crawls in a row stops being crawled", async 
 
 test("a single posting the company took down is reported as gone; an outage is not", async () => {
   const { getDescription } = await import("../src/lib/details");
-  assert.deepEqual(await getDescription("greenhouse", "figma", "999"), { html: null, gone: true });
-  assert.deepEqual(await getDescription("greenhouse", "figma", "998"), { html: null, gone: false });
+  const figma = { ats: "greenhouse" as const, slug: "figma", name: "Figma" };
+  assert.deepEqual(await getDescription(figma, "999"), { detail: null, gone: true });
+  assert.deepEqual(await getDescription(figma, "998"), { detail: null, gone: false });
 });

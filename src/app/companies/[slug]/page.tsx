@@ -10,16 +10,13 @@ import { Badge } from "@/components/ui/Badge";
 import { buttonClass } from "@/components/ui/Button";
 import { ATS_LABEL, formatSalary, splitLocations } from "@/components/feed/format";
 import { currentUser } from "@/lib/auth";
+import { PROVIDERS } from "@/lib/ats";
+import type { Company } from "@/lib/companies";
+import type { Ats } from "@/lib/types";
 import { companyWithJobs } from "@/lib/query";
 import type { JobRow } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
-
-const BOARD_URL: Record<string, (slug: string) => string> = {
-  greenhouse: (s) => `https://job-boards.greenhouse.io/${s}`,
-  lever: (s) => `https://jobs.lever.co/${s}`,
-  ashby: (s) => `https://jobs.ashbyhq.com/${s}`,
-};
 
 export async function generateMetadata({ params }: PageProps<"/companies/[slug]">): Promise<Metadata> {
   const data = await companyWithJobs((await params).slug);
@@ -77,7 +74,9 @@ export default async function CompanyPage({ params }: PageProps<"/companies/[slu
           </div>
           <div className="flex gap-2">
             <FollowCompany slug={company.slug} name={company.name} signedIn={!!user} />
-            <a href={BOARD_URL[company.ats]?.(company.slug)} target="_blank" rel="noreferrer" className={buttonClass("secondary", "lg")}>
+            <a
+              href={PROVIDERS[company.ats as Ats]?.boardUrl({ ats: company.ats as Ats, slug: company.slug, name: company.name, board: (company.board ?? undefined) as Company["board"] })}
+              target="_blank" rel="noreferrer" className={buttonClass("secondary", "lg")}>
               Careers page <ArrowUpRight size={16} />
             </a>
           </div>

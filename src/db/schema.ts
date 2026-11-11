@@ -12,6 +12,8 @@ export const companies = pgTable(
     slug: text("slug").notNull(),
     name: text("name").notNull(),
     domain: text("domain"),
+    /** Extra identifiers some ATSs need, e.g. Workday { host, site }, Oracle { host, site }. */
+    board: jsonb("board"),
     enabled: boolean("enabled").notNull().default(true),
     first_crawled_at: ts("first_crawled_at"),
     last_ok_at: ts("last_ok_at"),
@@ -20,6 +22,8 @@ export const companies = pgTable(
     consecutive_failures: integer("consecutive_failures").notNull().default(0),
     consecutive_empty: integer("consecutive_empty").notNull().default(0),
     open_jobs: integer("open_jobs").notNull().default(0),
+    /** Big paginated boards read only their newest pages most runs; a full pass (which can close jobs) runs hourly. */
+    last_full_crawl_at: ts("last_full_crawl_at"),
   },
   (t) => [primaryKey({ columns: [t.ats, t.slug] })],
 );
@@ -51,6 +55,8 @@ export const jobs = pgTable(
     seniority: text("seniority").notNull(),
     salary: text("salary"),
     salary_min: integer("salary_min"), // yearly, parsed from `salary`, for sorting
+    /** True once the full description has been read (some ATS lists don't include it). */
+    desc_checked: boolean("desc_checked").notNull().default(false),
   },
   (t) => [
     index("jobs_open_seen").on(t.first_seen_at.desc()).where(sql`${t.closed_at} is null`),

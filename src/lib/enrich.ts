@@ -109,16 +109,32 @@ export function parseSalaryMin(raw: string | null): number | null {
   return yearly >= 10_000 && yearly <= 5_000_000 ? yearly : null;
 }
 
+// "$150,000 - $190,000", "$150K–$190K", "USD 150,000 to 190,000" (yearly ranges written in the description).
+const PAY_AMOUNT = String.raw`(\d{2,3}(?:,\d{3})+|\d{2,3}(?:\.\d)?\s?[kK])`;
+const RE_PAY_RANGE = new RegExp(String.raw`(?:\$|USD\s?)\s?${PAY_AMOUNT}(?:\.\d{2})?\s*(?:-|–|—|to)\s*(?:\$|USD\s?)?\s?${PAY_AMOUNT}`);
+
+/** A yearly pay range stated in the description, when the ATS has no structured salary. */
+export function salaryFromText(text: string): string | null {
+  const m = text.match(RE_PAY_RANGE);
+  if (!m) return null;
+  const n = (v: string) => (/k$/i.test(v.trim()) ? parseFloat(v) * 1000 : Number(v.replace(/,/g, "")));
+  const [lo, hi] = [n(m[1]), n(m[2])];
+  if (lo < 20_000 || hi < lo || hi > 2_000_000) return null; // not a yearly salary range
+  return `USD ${lo.toLocaleString("en-US")}–${hi.toLocaleString("en-US")} per year`;
+}
+
 export function enrich(job: RawJob): EnrichedJob {
   const text = job.descriptionText;
+  const salary = job.salary ?? salaryFromText(text);
   return {
     ...job,
+    salary,
     country: country(job),
     remote: job.isRemote ?? RE_REMOTE.test(job.location),
     visa: classifyVisa(text),
     minExp: extractMinExp(text),
     category: categorize(job.title, job.department),
     seniority: seniority(job.title, job.employmentType),
-    salaryMin: parseSalaryMin(job.salary),
+    salaryMin: parseSalaryMin(salary),
   };
 }

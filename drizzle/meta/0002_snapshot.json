@@ -1,6 +1,6 @@
 {
-  "id": "d463cc63-6ec9-4ba6-9400-da95408ffd9c",
-  "prevId": "1fd00f78-ac26-407d-be64-79a1ee3df5c6",
+  "id": "b69c9e94-6590-4f64-8403-0e86c3415a1e",
+  "prevId": "d463cc63-6ec9-4ba6-9400-da95408ffd9c",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -139,6 +139,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "board": {
+          "name": "board",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
         "enabled": {
           "name": "enabled",
           "type": "boolean",
@@ -190,6 +196,12 @@
           "primaryKey": false,
           "notNull": true,
           "default": 0
+        },
+        "last_full_crawl_at": {
+          "name": "last_full_crawl_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {},
@@ -410,6 +422,13 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": false
+        },
+        "desc_checked": {
+          "name": "desc_checked",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
         }
       },
       "indexes": {

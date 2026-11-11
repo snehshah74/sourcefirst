@@ -15,6 +15,13 @@
       "when": 1794356397527,
       "tag": "0001_free_tier_and_ux",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794361311387,
+      "tag": "0002_more_ats",
+      "breakpoints": true
     }
   ]
 }

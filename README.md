@@ -1,6 +1,6 @@
 # SourceFirst
 
-A job board that reads company ATS boards (Greenhouse, Lever, Ashby) directly every 15 minutes, so jobs show up here before they reach LinkedIn or Indeed. Users can create accounts, save jobs, track applications, and get email alerts for saved searches.
+A job board that reads company job boards on 9 applicant tracking systems (Workday, Greenhouse, Lever, Ashby, SmartRecruiters, Workable, Rippling, Recruitee, Oracle Cloud) directly every 15 minutes, so jobs show up here before they reach LinkedIn or Indeed. Users can create accounts, save jobs, track applications, and get email alerts for saved searches.
 
 ## Run it locally (no setup needed)
 ```bash
@@ -52,12 +52,12 @@ Edit `src/db/schema.ts`, run `npm run db:generate`, and commit the new file in `
 ## Adding companies (coverage = freshness)
 How fresh the feed feels depends on how many companies you crawl: 271 boards produce roughly 15–25 new jobs an hour.
 1. Add `Name|domain` lines to `scripts/candidates.txt`.
-2. Run `npm run discover`. It probes Greenhouse, Lever and Ashby for each candidate and writes the hits to `src/lib/companies.discovered.json`.
+2. Run `npm run discover`. It tries each name on Greenhouse, Lever, Ashby, SmartRecruiters, Workable, Rippling and Recruitee, and checks every careers URL in `scripts/boards.txt` (the only way to add Workday and Oracle boards, whose ids can't be guessed). Live boards go to `src/lib/companies.discovered.json`.
 3. Restart the app. The next crawl imports the new boards; their existing jobs come in without triggering alerts.
 
 If a discovered board turns out to belong to a different company, add it to `BLOCKLIST` in `src/lib/companies.ts`.
 
 ## Next steps
-- **Coverage:** keep growing `candidates.txt`, and add Workday, SmartRecruiters and Workable fetchers.
+- **Coverage:** keep growing `candidates.txt` and `scripts/boards.txt` (paste any careers URL from the 9 supported platforms).
 - **AI enrichment:** send only `visa = 'Maybe'` jobs to an LLM.
 - **Email verification** before sending alerts (needs Resend configured).
