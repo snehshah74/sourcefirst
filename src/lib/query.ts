@@ -6,17 +6,28 @@ import { skillFor } from "./skills";
 const { jobs, companies, hiddenJobs } = schema;
 
 // Reuse answers for a minute, so a burst of visitors asking the same thing costs the database one query, not hundreds.
-const g = globalThis as unknown as { __sfmemo?: Map<string, { at: number; p: Promise<unknown> }> };
+// If the database is struggling, keep serving the last good answer instead of failing (and instead of retrying on every visit).
+const g = globalThis as unknown as { __sfmemo?: Map<string, { at: number; p: Promise<unknown>; good?: unknown }> };
 const memos = (g.__sfmemo ??= new Map());
 function memo<T>(key: string, fn: () => Promise<T>, ttlMs = 60_000): Promise<T> {
   const hit = memos.get(key);
   if (hit && Date.now() - hit.at < ttlMs) return hit.p as Promise<T>;
   if (memos.size > 1000) memos.clear();
-  const p = fn();
-  memos.set(key, { at: Date.now(), p });
-  p.catch(() => memos.delete(key));
-  return p;
+  const entry: { at: number; p: Promise<unknown>; good?: unknown } = { at: Date.now(), p: Promise.resolve(), good: hit?.good };
+  entry.p = fn().then(
+    (v) => ((entry.good = v), v),
+    (err) => {
+      if (entry.good !== undefined) return entry.good;
+      entry.at = 0; // nothing to fall back on: let the next visit try again
+      throw err;
+    },
+  );
+  memos.set(key, entry);
+  return entry.p as Promise<T>;
 }
+
+/** Counting every match gets slow on broad searches, so counts stop at this many and show as "10,000+". */
+const COUNT_CAP = 10_000;
 
 interface JobFilters {
   q?: string;
@@ -130,11 +141,13 @@ async function searchJobsNow(f: JobFilters) {
   const pageSize = Math.min(f.pageSize ?? 50, 100);
   const page = Math.max(1, Math.floor(f.page ?? 1));
   const w = where(f);
+  const matches = db.select({ one: sql`1` }).from(jobs).where(w).limit(COUNT_CAP + 1).as("matches");
   const [[{ n }], rows] = await Promise.all([
-    db.select({ n: count() }).from(jobs).where(w),
+    db.select({ n: count() }).from(matches),
     db.select(COLS).from(jobs).where(w).orderBy(...(f.sort === "salary" ? [desc(jobs.salary_min), desc(jobs.first_seen_at)] : [desc(jobs.first_seen_at)]), desc(jobs.id)).limit(pageSize).offset((page - 1) * pageSize),
   ]);
-  return { jobs: rows as unknown as JobRow[], total: Number(n), page, pageSize };
+  const capped = Number(n) > COUNT_CAP;
+  return { jobs: rows as unknown as JobRow[], total: capped ? COUNT_CAP : Number(n), capped, page, pageSize };
 }
 
 export const stats = () => memo("stats", statsNow);
@@ -144,8 +157,9 @@ async function statsNow() {
   const dayAgo = new Date(Date.now() - 86400_000);
   const hourAgo = new Date(Date.now() - 3600_000);
   const open = isNull(jobs.closed_at);
+  // The open-job total comes from each company's own count (a small table), not from counting every job.
   const [[a], [b], [c], [d], [e]] = await Promise.all([
-    db.select({ n: count() }).from(jobs).where(open),
+    db.select({ n: sql<number>`coalesce(sum(${companies.open_jobs}), 0)` }).from(companies).where(isNotNull(companies.last_ok_at)),
     db.select({ n: count() }).from(jobs).where(and(open, gte(jobs.first_seen_at, dayAgo))),
     db.select({ n: count() }).from(jobs).where(and(open, gte(jobs.first_seen_at, hourAgo))),
     db.select({ n: count() }).from(companies).where(isNotNull(companies.last_ok_at)),

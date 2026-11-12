@@ -21,7 +21,7 @@ export default async function Landing({ params }: PageProps<"/jobs/[slug]">) {
   const l = LANDINGS.find((x) => x.slug === slug);
   if (!l) notFound();
   const qs = new URLSearchParams(l.filters);
-  const { jobs, total } = await searchJobs({ ...parseFilters(qs), pageSize: 50 });
+  const { jobs, total, capped } = await searchJobs({ ...parseFilters(qs), pageSize: 50 });
 
   return (
     <>
@@ -29,7 +29,7 @@ export default async function Landing({ params }: PageProps<"/jobs/[slug]">) {
     <main className="mx-auto w-full max-w-4xl flex-1 px-4 pb-10 pt-8 sm:px-6">
       <h1 className="text-3xl font-semibold tracking-tight text-balance sm:text-4xl">{l.h1}</h1>
       <p className="mt-2 text-muted">{l.blurb}</p>
-      <p className="mt-1 text-sm text-muted">{total.toLocaleString()} open roles right now.</p>
+      <p className="mt-1 text-sm text-muted">{total.toLocaleString()}{capped ? "+" : ""} open roles right now.</p>
       <Link href={`/?${qs.toString()}#search`} className={buttonClass("primary", "md", "mt-5")}>
         Filter these jobs →
       </Link>

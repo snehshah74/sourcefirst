@@ -43,13 +43,15 @@ function feedQuery(sp: URLSearchParams) {
 interface Page {
   jobs: JobRow[];
   total: number;
+  /** true when there are more matches than the server counts ("10,000+") */
+  capped?: boolean;
 }
 
 export function useFeed(guest: boolean) {
   const { sp } = useUrlState();
   const query = useMemo(() => feedQuery(sp), [sp]);
 
-  const [state, setState] = useState<{ query: string; jobs: JobRow[]; total: number; page: number; now: number } | null>(null);
+  const [state, setState] = useState<{ query: string; jobs: JobRow[]; total: number; capped?: boolean; page: number; now: number } | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
   const [pending, setPending] = useState<{ query: string; data: Page; count: number } | null>(null);
   const [lastRun, setLastRun] = useState<string | null>(null);
@@ -62,7 +64,7 @@ export function useFeed(guest: boolean) {
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
       .then((d: Page) => {
         if (!alive) return;
-        setState({ query, jobs: d.jobs, total: d.total, page: 1, now: Date.now() });
+        setState({ query, jobs: d.jobs, total: d.total, capped: d.capped, page: 1, now: Date.now() });
         setPending(null);
         setError(null);
       })
@@ -80,7 +82,7 @@ export function useFeed(guest: boolean) {
       setState((s) => {
         if (!s || s.query !== state.query) return s;
         const seen = new Set(s.jobs.map((j) => j.id));
-        return { ...s, jobs: [...s.jobs, ...d.jobs.filter((j) => !seen.has(j.id))], total: d.total, page: s.page + 1 };
+        return { ...s, jobs: [...s.jobs, ...d.jobs.filter((j) => !seen.has(j.id))], total: d.total, capped: d.capped, page: s.page + 1 };
       });
     } finally {
       setLoadingMore(false);
@@ -122,7 +124,7 @@ export function useFeed(guest: boolean) {
 
   const showPending = useCallback(() => {
     if (!pending) return;
-    setState({ query: pending.query, jobs: pending.data.jobs, total: pending.data.total, page: 1, now: Date.now() });
+    setState({ query: pending.query, jobs: pending.data.jobs, total: pending.data.total, capped: pending.data.capped, page: 1, now: Date.now() });
     setPending(null);
   }, [pending]);
 
@@ -150,6 +152,8 @@ export function useFeed(guest: boolean) {
     query,
     jobs: ready ? state!.jobs : [],
     total: ready ? state!.total : null,
+    /** the total as people read it: "10,000+" when the count stopped early */
+    totalLabel: ready ? `${state!.total.toLocaleString()}${state!.capped ? "+" : ""}` : "",
     stale: state && !ready ? state.jobs : null, // previous results, dimmed while the new ones load
     loading: !ready,
     loadingMore,

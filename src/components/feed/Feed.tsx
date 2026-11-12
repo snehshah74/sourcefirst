@@ -334,7 +334,7 @@ export default function Feed({ signedIn, hero }: { signedIn: boolean; hero?: Rea
             <div className="min-w-0">
               <h2 className="truncate font-display text-[28px] font-medium leading-tight tracking-tight sm:text-[32px]">{heading}</h2>
               <p className="mt-1 flex flex-wrap items-center gap-x-1.5 text-sm text-muted">
-                {feed.total === null ? "Loading…" : `${feed.total.toLocaleString()} open ${feed.total === 1 ? "role" : "roles"}${whereLabel}`}
+                {feed.total === null ? "Loading…" : `${feed.totalLabel} open ${feed.total === 1 ? "role" : "roles"}${whereLabel}`}
                 {get("us") !== "0" && !get("place") && (
                   <button type="button" onClick={() => update({ us: "0", job: null })} className="text-fg underline underline-offset-2 hover:no-underline">
                     show all countries
@@ -417,7 +417,7 @@ export default function Feed({ signedIn, hero }: { signedIn: boolean; hero?: Rea
           {!signedIn && !feed.loading && feed.total !== null && feed.total > feed.jobs.length && (
             <div className="mt-4 flex flex-col items-start justify-between gap-5 rounded-3xl bg-ink p-6 text-ink-fg ring-1 ring-ink-line sm:flex-row sm:items-center sm:p-8">
               <div>
-                <h3 className="font-display text-[24px] font-medium tracking-tight">{(feed.total - feed.jobs.length).toLocaleString()} more roles match this search</h3>
+                <h3 className="font-display text-[24px] font-medium tracking-tight">{(feed.total - feed.jobs.length).toLocaleString()}{feed.totalLabel.endsWith("+") ? "+" : ""} more roles match this search</h3>
                 <p className="mt-1 text-[15px] text-ink-muted">Sign up free to see all of them, save jobs and get alerts</p>
               </div>
               <div className="flex shrink-0 items-center gap-2">
@@ -474,7 +474,7 @@ export default function Feed({ signedIn, hero }: { signedIn: boolean; hero?: Rea
             </div>
             <div className="border-t border-line p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
               <Button variant="primary" size="lg" className="w-full" onClick={() => setFiltersOpen(false)}>
-                Show {feed.total === null ? "" : feed.total.toLocaleString()} {feed.total === 1 ? "job" : "jobs"}
+                Show {feed.totalLabel} {feed.total === 1 ? "job" : "jobs"}
               </Button>
             </div>
           </Dialog.Content>
