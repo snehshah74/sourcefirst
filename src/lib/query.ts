@@ -5,6 +5,19 @@ import { skillFor } from "./skills";
 
 const { jobs, companies, hiddenJobs } = schema;
 
+// Reuse answers for a minute, so a burst of visitors asking the same thing costs the database one query, not hundreds.
+const g = globalThis as unknown as { __sfmemo?: Map<string, { at: number; p: Promise<unknown> }> };
+const memos = (g.__sfmemo ??= new Map());
+function memo<T>(key: string, fn: () => Promise<T>, ttlMs = 60_000): Promise<T> {
+  const hit = memos.get(key);
+  if (hit && Date.now() - hit.at < ttlMs) return hit.p as Promise<T>;
+  if (memos.size > 1000) memos.clear();
+  const p = fn();
+  memos.set(key, { at: Date.now(), p });
+  p.catch(() => memos.delete(key));
+  return p;
+}
+
 interface JobFilters {
   q?: string;
   ats?: string[];
@@ -109,7 +122,10 @@ const COLS = {
   skills: jobs.skills,
 };
 
-export async function searchJobs(f: JobFilters) {
+/** Personal results (with someone's hidden jobs left out) are never shared; everything else is. */
+export const searchJobs = (f: JobFilters) => (f.hiddenFor ? searchJobsNow(f) : memo(`jobs:${JSON.stringify(f)}`, () => searchJobsNow(f)));
+
+async function searchJobsNow(f: JobFilters) {
   const db = await getDb();
   const pageSize = Math.min(f.pageSize ?? 50, 100);
   const page = Math.max(1, Math.floor(f.page ?? 1));
@@ -121,7 +137,9 @@ export async function searchJobs(f: JobFilters) {
   return { jobs: rows as unknown as JobRow[], total: Number(n), page, pageSize };
 }
 
-export async function stats() {
+export const stats = () => memo("stats", statsNow);
+
+async function statsNow() {
   const db = await getDb();
   const dayAgo = new Date(Date.now() - 86400_000);
   const hourAgo = new Date(Date.now() - 3600_000);
@@ -138,7 +156,9 @@ export async function stats() {
 
 
 /** The most recently found open roles for the live log on the home page, one per company so a bulk post can't fill it. */
-export async function latestJobs(limit = 5) {
+export const latestJobs = (limit = 5) => memo(`latest:${limit}`, () => latestJobsNow(limit));
+
+async function latestJobsNow(limit: number) {
   const db = await getDb();
   const rows = await db
     .select({ id: jobs.id, title: jobs.title, company_name: jobs.company_name, company_domain: jobs.company_domain, first_seen_at: jobs.first_seen_at })
@@ -162,7 +182,9 @@ export async function featuredCompanies(slugs: string[]) {
 }
 
 /** Every company with open roles, biggest first (for the /companies directory). */
-export async function allCompanies() {
+export const allCompanies = () => memo("companies", allCompaniesNow, 300_000);
+
+async function allCompaniesNow() {
   const db = await getDb();
   return db
     .select({ slug: companies.slug, name: companies.name, domain: companies.domain, ats: companies.ats, open_jobs: companies.open_jobs })
