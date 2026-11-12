@@ -1,4 +1,4 @@
-import { and, count, desc, eq, gt, isNull, lt, sql } from "drizzle-orm";
+import { and, count, desc, eq, gt, isNull, sql } from "drizzle-orm";
 import { getDb, schema, type DB } from "@/db";
 import { COMPANIES, type Company } from "./companies";
 import { FetchError, fetchCompanyJobs, PROVIDERS } from "./ats";
@@ -145,22 +145,27 @@ async function crawlCompany(db: DB, c: Company, res: IngestResult) {
         desc_checked: provider.descriptionsInList,
       }));
       // xmax = 0 means the row was inserted, not updated: that's how we count genuinely new jobs.
+      // Only rewrite a row when something about it changed. Touching all ~130k rows every run
+      // burned through the database's disk I/O budget and stalled every page query.
+      const set = {
+        title: sql`excluded.title`, department: sql`excluded.department`, url: sql`excluded.url`,
+        apply_url: sql`excluded.apply_url`, published_at: sql`coalesce(excluded.published_at, ${jobs.published_at})`,
+        closed_at: sql`null`,
+        category: sql`excluded.category`, seniority: sql`excluded.seniority`,
+        company_name: sql`excluded.company_name`, company_domain: sql`excluded.company_domain`,
+        location: keepIfDetailed("location"), country: keepIfDetailed("country"), remote: keepIfDetailed("remote"),
+        employment_type: keepIfDetailed("employment_type"), visa: keepIfDetailed("visa"), min_exp: keepIfDetailed("min_exp"),
+        salary: keepIfDetailed("salary"), salary_min: keepIfDetailed("salary_min"),
+        desc_checked: sql`${jobs.desc_checked} or excluded.desc_checked`,
+      };
+      const cols = Object.keys(set).map((k) => sql.raw(`jobs.${k}`));
       const out = await tx
         .insert(jobs)
         .values(chunk)
         .onConflictDoUpdate({
           target: jobs.id,
-          set: {
-            title: sql`excluded.title`, department: sql`excluded.department`, url: sql`excluded.url`,
-            apply_url: sql`excluded.apply_url`, published_at: sql`coalesce(excluded.published_at, ${jobs.published_at})`,
-            last_seen_at: sql`excluded.last_seen_at`, closed_at: sql`null`,
-            category: sql`excluded.category`, seniority: sql`excluded.seniority`,
-            company_name: sql`excluded.company_name`, company_domain: sql`excluded.company_domain`,
-            location: keepIfDetailed("location"), country: keepIfDetailed("country"), remote: keepIfDetailed("remote"),
-            employment_type: keepIfDetailed("employment_type"), visa: keepIfDetailed("visa"), min_exp: keepIfDetailed("min_exp"),
-            salary: keepIfDetailed("salary"), salary_min: keepIfDetailed("salary_min"),
-            desc_checked: sql`${jobs.desc_checked} or excluded.desc_checked`,
-          },
+          set,
+          setWhere: sql`(${sql.join(cols, sql`, `)}) is distinct from (${sql.join(Object.values(set), sql`, `)})`,
         })
         .returning({ inserted: sql<boolean>`(xmax = 0)` });
       inserted += out.filter((r) => r.inserted).length;
@@ -170,16 +175,18 @@ async function crawlCompany(db: DB, c: Company, res: IngestResult) {
     // Close jobs that vanished from the board.
     const emptyStreak = result.complete && ids.length === 0 ? (row?.consecutive_empty ?? 0) + 1 : 0;
     const looksGlitched = result.complete && ids.length === 0 && (row?.open_jobs ?? 0) > 0 && emptyStreak < EMPTY_CRAWLS_BEFORE_CLOSING;
+    // Jobs on this board that weren't in this crawl (one JSON parameter, however many ids there are).
+    const notSeen = sql`not (${jobs.id} = any(select jsonb_array_elements_text(${JSON.stringify(ids)}::jsonb)))`;
     let closeWhere;
     if (result.complete) {
-      if (!looksGlitched) closeWhere = and(boardFilter(c), isNull(jobs.closed_at), lt(jobs.last_seen_at, now));
+      if (!looksGlitched) closeWhere = and(boardFilter(c), isNull(jobs.closed_at), notSeen);
     } else if (full) {
       // A capped board (e.g. Workday shows at most 2,000): we only saw the newest part, so judge only jobs
       // posted inside that window (with a day's margin). Older ones are checked when opened or enriched.
       const dates = enriched.map((j) => (j.publishedAt ? new Date(j.publishedAt).getTime() : NaN)).filter(Number.isFinite);
       if (dates.length) {
         const oldest = new Date(Math.min(...dates) + DAY);
-        closeWhere = and(boardFilter(c), isNull(jobs.closed_at), lt(jobs.last_seen_at, now), gt(jobs.published_at, oldest));
+        closeWhere = and(boardFilter(c), isNull(jobs.closed_at), notSeen, gt(jobs.published_at, oldest));
       }
     }
     if (closeWhere) {
