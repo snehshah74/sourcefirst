@@ -22,6 +22,13 @@
       "when": 1794361311387,
       "tag": "0002_more_ats",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1794461477767,
+      "tag": "0003_places_and_skills",
+      "breakpoints": true
     }
   ]
 }
