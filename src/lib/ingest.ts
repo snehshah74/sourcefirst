@@ -1,4 +1,4 @@
-import { and, count, desc, eq, gt, isNull, sql } from "drizzle-orm";
+import { and, count, desc, eq, gt, isNull, or, sql } from "drizzle-orm";
 import { getDb, schema, type DB } from "@/db";
 import { COMPANIES, type Company } from "./companies";
 import { FetchError, fetchCompanyJobs, PROVIDERS } from "./ats";
@@ -143,6 +143,8 @@ async function crawlCompany(db: DB, c: Company, res: IngestResult) {
         salary: j.salary,
         salary_min: j.salaryMin,
         desc_checked: provider.descriptionsInList,
+        places: j.places,
+        skills: j.skills,
       }));
       // xmax = 0 means the row was inserted, not updated: that's how we count genuinely new jobs.
       // Only rewrite a row when something about it changed. Touching all ~130k rows every run
@@ -156,6 +158,9 @@ async function crawlCompany(db: DB, c: Company, res: IngestResult) {
         location: keepIfDetailed("location"), country: keepIfDetailed("country"), remote: keepIfDetailed("remote"),
         employment_type: keepIfDetailed("employment_type"), visa: keepIfDetailed("visa"), min_exp: keepIfDetailed("min_exp"),
         salary: keepIfDetailed("salary"), salary_min: keepIfDetailed("salary_min"),
+        // Places start empty on rows from before the filter existed, so fill them from the list until a detail read refines them.
+        places: sql`case when jobs.desc_checked and not excluded.desc_checked and cardinality(jobs.places) > 0 then jobs.places else excluded.places end`,
+        skills: keepIfDetailed("skills"),
         desc_checked: sql`${jobs.desc_checked} or excluded.desc_checked`,
       };
       const cols = Object.keys(set).map((k) => sql.raw(`jobs.${k}`));
@@ -221,7 +226,7 @@ async function fillDetails(db: DB, c: Company, res: IngestResult) {
   const pending = await db
     .select()
     .from(jobs)
-    .where(and(boardFilter(c), isNull(jobs.closed_at), eq(jobs.desc_checked, false)))
+    .where(and(boardFilter(c), isNull(jobs.closed_at), or(eq(jobs.desc_checked, false), isNull(jobs.skills))))
     .orderBy(desc(jobs.first_seen_at))
     .limit(DETAILS_PER_BOARD_PER_RUN);
   for (const j of pending) {
@@ -253,7 +258,7 @@ async function fillDetails(db: DB, c: Company, res: IngestResult) {
       .set({
         location: e.location, country: e.country, remote: e.remote, employment_type: e.employmentType,
         visa: e.visa, min_exp: e.minExp, salary: e.salary, salary_min: e.salaryMin, category: e.category, seniority: e.seniority,
-        desc_checked: true,
+        places: e.places, skills: e.skills, desc_checked: true,
       })
       .where(eq(jobs.id, j.id));
   }

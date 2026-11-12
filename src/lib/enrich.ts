@@ -1,4 +1,6 @@
 import type { EnrichedJob, RawJob, Visa } from "./types";
+import { placesOf } from "./places";
+import { skillsIn } from "./skills";
 
 /**
  * Rule-based enrichment. Regex rules catch the explicit cases cheaply and
@@ -131,10 +133,13 @@ export function salaryFromText(text: string): string | null {
 export function enrich(job: RawJob): EnrichedJob {
   const text = job.descriptionText;
   const salary = job.salary ?? salaryFromText(text);
+  const where = country(job);
   return {
     ...job,
     salary,
-    country: country(job),
+    country: where,
+    places: placesOf(job.location, where === "USA"),
+    skills: skillsIn(`${job.title}\n${text}`),
     remote: job.isRemote ?? RE_REMOTE.test(job.location),
     visa: classifyVisa(text),
     minExp: extractMinExp(text),

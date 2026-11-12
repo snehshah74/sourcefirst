@@ -22,8 +22,8 @@ import { usePrefs } from "./usePrefs";
 import { describePrefs, prefsToQuery, type Prefs } from "@/lib/prefs";
 
 /** URL params that are filters (as opposed to UI state like ?job=). */
-const FILTER_PARAMS = ["q", "loc", "minSalary", "since", "visa", "category", "seniority", "ats", "maxExp", "remote", "company", "us", "sort"];
-const PREF_PARAMS = ["category", "seniority", "remote", "us", "visa"];
+const FILTER_PARAMS = ["q", "loc", "minSalary", "since", "visa", "category", "seniority", "ats", "maxExp", "remote", "company", "us", "place", "skills", "sort"];
+const PREF_PARAMS = ["category", "seniority", "remote", "us", "place", "visa"];
 
 function useMedia(query: string) {
   return useSyncExternalStore(
@@ -281,7 +281,11 @@ export default function Feed({ signedIn, hero }: { signedIn: boolean; hero?: Rea
 
   const railCount = RAIL_PARAMS.filter((k) => get(k)).length;
   const reset = () =>
-    update({ q: null, loc: null, minSalary: null, since: null, visa: null, category: null, seniority: null, ats: null, maxExp: null, remote: null, company: null, us: null });
+    update({ q: null, loc: null, minSalary: null, since: null, visa: null, category: null, seniority: null, ats: null, maxExp: null, remote: null, company: null, us: null, place: null, skills: null });
+  const picked = get("place")?.split(",").filter(Boolean) ?? [];
+  const whereLabel = picked.length
+    ? ` in ${picked.slice(0, 2).join(", ")}${picked.length > 2 ? ` and ${picked.length - 2} more` : ""}`
+    : get("us") !== "0" ? " in the US" : "";
   const heading = companyName ? `${companyName} jobs` : get("q") ? `“${get("q")}”` : forYouActive ? "Picked for you" : "Fresh jobs";
 
   const results = feed.error ? (
@@ -330,8 +334,8 @@ export default function Feed({ signedIn, hero }: { signedIn: boolean; hero?: Rea
             <div className="min-w-0">
               <h2 className="truncate font-display text-[28px] font-medium leading-tight tracking-tight sm:text-[32px]">{heading}</h2>
               <p className="mt-1 flex flex-wrap items-center gap-x-1.5 text-sm text-muted">
-                {feed.total === null ? "Loading…" : `${feed.total.toLocaleString()} open ${feed.total === 1 ? "role" : "roles"}${get("us") !== "0" ? " in the US" : ""}`}
-                {get("us") !== "0" && (
+                {feed.total === null ? "Loading…" : `${feed.total.toLocaleString()} open ${feed.total === 1 ? "role" : "roles"}${whereLabel}`}
+                {get("us") !== "0" && !get("place") && (
                   <button type="button" onClick={() => update({ us: "0", job: null })} className="text-fg underline underline-offset-2 hover:no-underline">
                     show all countries
                   </button>

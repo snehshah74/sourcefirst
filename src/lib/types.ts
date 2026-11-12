@@ -31,6 +31,10 @@ export interface EnrichedJob extends RawJob {
   category: string;
   seniority: string;
   salaryMin: number | null;
+  /** Countries and regions, e.g. ["India", "Asia-Pacific"] */
+  places: string[];
+  /** Tools and languages the posting asks for */
+  skills: string[];
 }
 
 /** Row returned to the UI. */
@@ -55,4 +59,5 @@ export interface JobRow {
   category: string;
   seniority: string;
   salary: string | null;
+  skills?: string[] | null;
 }

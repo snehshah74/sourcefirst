@@ -265,6 +265,15 @@ export function JobDetail({
 
         {job.visa !== "Maybe" && <p className="-mt-3 text-xs text-subtle">{VISA_HELP[job.visa]} Always confirm with the employer.</p>}
 
+        {job.skills && job.skills.length > 0 && (
+          <section>
+            <h3 className="mb-2 text-sm font-semibold">Skills mentioned</h3>
+            <div className="flex flex-wrap gap-1.5">
+              {job.skills.map((k) => <span key={k} className="rounded-md bg-surface-2 px-2 py-1 text-xs text-muted">{k}</span>)}
+            </div>
+          </section>
+        )}
+
         {loc.extra > 0 && (
           <section>
             <h3 className="mb-2 text-sm font-semibold">Locations</h3>

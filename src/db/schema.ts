@@ -57,10 +57,16 @@ export const jobs = pgTable(
     salary_min: integer("salary_min"), // yearly, parsed from `salary`, for sorting
     /** True once the full description has been read (some ATS lists don't include it). */
     desc_checked: boolean("desc_checked").notNull().default(false),
+    /** Countries and regions from the location, for the country filter. */
+    places: text("places").array().notNull().default(sql`'{}'::text[]`),
+    /** Tools and languages from the description; null until the description has been read. */
+    skills: text("skills").array(),
   },
   (t) => [
     index("jobs_open_seen").on(t.first_seen_at.desc()).where(sql`${t.closed_at} is null`),
     index("jobs_company").on(t.ats, t.company_slug),
+    index("jobs_places").using("gin", t.places),
+    index("jobs_skills").using("gin", t.skills),
   ],
 );
 

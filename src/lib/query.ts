@@ -1,6 +1,7 @@
 import { and, count, desc, eq, gte, ilike, inArray, isNotNull, isNull, lte, max, or, sql, type SQL } from "drizzle-orm";
 import { getDb, schema } from "@/db";
 import type { JobRow } from "./types";
+import { skillFor } from "./skills";
 
 const { jobs, companies, hiddenJobs } = schema;
 
@@ -12,6 +13,10 @@ interface JobFilters {
   seniority?: string[];
   remote?: boolean;
   usOnly?: boolean;
+  /** countries or regions, any of them ("India", "Europe") */
+  places?: string[];
+  /** tools the posting asks for, any of them ("SQL", "Python") */
+  skills?: string[];
   sinceHours?: number;
   /** only jobs discovered after this instant (used by email alerts) */
   discoveredAfter?: Date;
@@ -38,7 +43,10 @@ export function parseFilters(sp: URLSearchParams): JobFilters {
     category: list("category"),
     seniority: list("seniority"),
     remote: sp.get("remote") === "1" || undefined,
-    usOnly: sp.get("us") !== "0",
+    // A picked country or region replaces the US-only default.
+    usOnly: sp.get("us") !== "0" && !sp.get("place"),
+    places: list("place")?.slice(0, 30),
+    skills: list("skills")?.slice(0, 30),
     sinceHours: num("since"),
     maxExp: num("maxExp"),
     company: sp.get("company") ?? undefined,
@@ -51,7 +59,7 @@ export function parseFilters(sp: URLSearchParams): JobFilters {
 }
 
 /** The filter keys that define a search (what a saved search stores). */
-const FILTER_KEYS = ["q", "loc", "minSalary", "ats", "visa", "category", "seniority", "remote", "us", "maxExp", "company", "sort"] as const;
+const FILTER_KEYS = ["q", "loc", "minSalary", "ats", "visa", "category", "seniority", "remote", "us", "place", "skills", "maxExp", "company", "sort"] as const;
 
 export function canonicalQuery(sp: URLSearchParams): string {
   const out = new URLSearchParams();
@@ -68,7 +76,9 @@ function where(f: JobFilters): SQL | undefined {
   if (f.q) {
     for (const term of f.q.trim().split(/\s+/).slice(0, 6)) {
       const t = `%${term.replace(/[%_\\]/g, (c) => `\\${c}`)}%`;
-      w.push(or(ilike(jobs.title, t), ilike(jobs.company_name, t), ilike(jobs.location, t), ilike(jobs.department, t)));
+      // Searching a skill ("BigQuery") also finds postings that ask for it, not just ones with it in the title.
+      const skill = skillFor(term);
+      w.push(or(ilike(jobs.title, t), ilike(jobs.company_name, t), ilike(jobs.location, t), ilike(jobs.department, t), skill ? sql`${jobs.skills} @> array[${skill}]::text[]` : undefined));
     }
   }
   if (f.ats?.length) w.push(inArray(jobs.ats, f.ats));
@@ -77,6 +87,8 @@ function where(f: JobFilters): SQL | undefined {
   if (f.seniority?.length) w.push(inArray(jobs.seniority, f.seniority));
   if (f.remote) w.push(eq(jobs.remote, true));
   if (f.usOnly) w.push(eq(jobs.country, "USA"));
+  if (f.places?.length) w.push(sql`${jobs.places} && array[${sql.join(f.places.map((p) => sql`${p}`), sql`, `)}]::text[]`);
+  if (f.skills?.length) w.push(sql`${jobs.skills} && array[${sql.join(f.skills.map((p) => sql`${p}`), sql`, `)}]::text[]`);
   if (f.company) w.push(eq(jobs.company_slug, f.company));
   if (f.loc) w.push(ilike(jobs.location, `%${f.loc.replace(/[%_\\]/g, (c) => `\\${c}`)}%`));
   if (f.minSalary) w.push(gte(jobs.salary_min, f.minSalary));
@@ -94,6 +106,7 @@ const COLS = {
   employment_type: jobs.employment_type, remote: jobs.remote, url: jobs.url, apply_url: jobs.apply_url,
   published_at: jobs.published_at, first_seen_at: jobs.first_seen_at, country: jobs.country, visa: jobs.visa,
   min_exp: jobs.min_exp, category: jobs.category, seniority: jobs.seniority, salary: jobs.salary, salary_min: jobs.salary_min,
+  skills: jobs.skills,
 };
 
 export async function searchJobs(f: JobFilters) {
